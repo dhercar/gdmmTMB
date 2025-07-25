@@ -35,7 +35,7 @@
 #' head(com)
 #'
 #'@export
-
+#'
 make_y_df <-
   function(com = NULL,
            id = NULL,

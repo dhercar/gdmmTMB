@@ -58,7 +58,6 @@ print_title2 <- function(text, symb = '-', width = getOption("width")) {
 #'   \item num - numerator: sum of absolute differences between x and y
 #'   \item den - denominator: sum of x and y values
 #' }
-#' @export
 #' @examples bray1(c(0,1,1), c(1,1,0))
 
 bray1 <- function(x,y){
@@ -66,4 +65,6 @@ bray1 <- function(x,y){
   den = sum(x,y)
   return(c(num = num, den = den))
 }
+
+
 
