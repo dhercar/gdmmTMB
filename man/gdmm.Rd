@@ -54,7 +54,7 @@ gdmm(
 
 \item{control}{List of control parameters passed to nlminb optimizer (e.g., \code{control = list(rel.tol = 1e-8, iter.max = 500)}).}
 
-\item{trace}{Logical. If TRUE, prints optimization trace information. Default is FALSE.}
+\item{trace}{Logical. If TRUE, prints optimization  information. Default is FALSE.}
 
 \item{bboot}{Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.}
 

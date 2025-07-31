@@ -14,7 +14,7 @@
 #' @param binary Logical. Whether to treat response as binary data before calculating dissimilarity from Y. Default is FALSE.
 #' @param method Dissimilarity method applied to Y. One of "bray", "sorensen", "jaccard". Default is "bray".
 #' @param control List of control parameters passed to nlminb optimizer (e.g., `control = list(rel.tol = 1e-8, iter.max = 500)`).
-#' @param trace Logical. If TRUE, prints optimization trace information. Default is FALSE.
+#' @param trace Logical. If TRUE, prints optimization  information. Default is FALSE.
 #' @param bboot Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.
 #' @param n_boot Integer. Number of bootstrap samples when `bboot = TRUE`. Default is 1000.
 #' @param n_cores Integer. Number of cores for parallel processing during bootstrapping. If NULL, uses `detectCores() - 2`.
