@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{print_title2}
 \alias{print_title2}
-\title{Nice titles for summary tables}
+\title{Centered title with decorated side}
 \usage{
 print_title2(text, symb = "-", width = getOption("width"))
 }
@@ -17,7 +17,7 @@ print_title2(text, symb = "-", width = getOption("width"))
 A \code{character} string (invisibly returned)
 }
 \description{
-Nice titles for summary tables
+Centered title with decorated side
 }
 \examples{
 print_title2(' hello world ', ':')

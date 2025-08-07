@@ -12,8 +12,6 @@
 #' n <- 50
 #' k <- 5
 #' AICc(log_likelihood, n, k)
-
-
 AICc <- function(log_likelihood, # model log-likelihood,
                  n,              # n samples
                  k) {            # k parameters estimated
@@ -39,8 +37,6 @@ AICc <- function(log_likelihood, # model log-likelihood,
 #' n <- 100
 #' k <- 5
 #' BICcalc(log_likelihood, n, k)
-
-
 BIC2 <- function(log_likelihood, # model log-likelihood,
                  n,              # n samples
                  k) {             # k parameters estimated

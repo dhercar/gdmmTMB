@@ -34,6 +34,9 @@
 #' Using generalized dissimilarity modelling to analyse and predict patterns of beta diversity in regional biodiversity assessment.
 #' \emph{Diversity and Distributions}, 13(3), 252–264. \doi{10.1111/j.1472-4642.2007.00341.x}
 #'
+#' @importFrom hardhat forge
+#' @importFrom TMB sdreport
+#'
 #' @export
 diss_gradient <- function(m,
                           var = 'all',
@@ -52,7 +55,8 @@ diss_gradient <- function(m,
 
   # Mean beta
   if (class(m) == 'gdmm') {
-    mean_beta <- m$sdrep$value[names(m$sdrep$value) == 'e_beta']
+    sdr <- TMB::sdreport(m$obj)
+    mean_beta <- sdr$value[names(sdr$value) == 'e_beta']
   } else if (class(m) == 'bbgdmm') {
     mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, mean)
   }
@@ -66,7 +70,7 @@ diss_gradient <- function(m,
 
     } else if (class(m) == 'gdmm')  {
       if (is.null(n_sim)) n_sim = 1000
-      sims <- MASS::mvrnorm(n_sim, m$sdrep$value, m$sdrep$cov)
+      sims <- MASS::mvrnorm(n_sim, sdr$value, sdr$cov)
     }
     sims <- sims[,colnames(sims) == 'e_beta', drop = F]
   }
@@ -84,7 +88,7 @@ diss_gradient <- function(m,
     x_new[,v] <- seq(min(m$X[,v]), max(m$X[,v]), length.out = n)
     x_new <- apply(x_new, 2, as.numeric)
     suppressWarnings({
-      f_x <- as.matrix(forge(x_new, m$form_X$blueprint)$predictors) %*% mean_beta
+      f_x <- as.matrix(hardhat::forge(x_new, m$form_X$blueprint)$predictors) %*% mean_beta
     })
 
     out_i <- data.frame(var = v,
@@ -96,7 +100,7 @@ diss_gradient <- function(m,
       samples <- do.call(cbind, lapply(1:n_sim, function(i){
         beta_i <- sims[i,,drop = F]
         suppressWarnings({
-          as.matrix(forge(x_new, m$form_X$blueprint)$predictors) %*% c(beta_i)
+          as.matrix(hardhat::forge(x_new, m$form_X$blueprint)$predictors) %*% c(beta_i)
         })
       }))
 

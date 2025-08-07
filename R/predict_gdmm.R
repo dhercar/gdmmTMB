@@ -42,7 +42,9 @@
 #' When \code{component = "uniqueness"}, the function computes site-level uniqueness
 #' values based on the full dissimilarity matrix. When \code{component = "dissimilarity"},
 #' it returns pairwise dissimilarity predictions.
-
+#' @importFrom hardhat forge
+#' @export
+#'
 predict.gdmm <- function(obj,
                          new_X = NULL,
                          new_W = NULL,
@@ -189,7 +191,7 @@ predict.gdmm <- function(obj,
 #' When \code{component = "uniqueness"}, the function computes site-level uniqueness
 #' values based on the full dissimilarity matrix. When \code{component = "dissimilarity"},
 #' it returns pairwise dissimilarity predictions.
-
+#' @export
 predict.bbgdmm <- predict.gdmm
 
 
@@ -220,7 +222,7 @@ coef_to_pred <- function(obj, intercept, beta, lambda, u,
                          new_W, new_X, new_re, D, n, component, scale_uniq, type, sigma) {
 
   if ((length(lambda) > 0) & !is.null(new_W)) {
-    form_W_new <- as.matrix(forge(new_W, obj$form_W$blueprint)$predictors)
+    form_W_new <- as.matrix(hardhat::forge(new_W, obj$form_W$blueprint)$predictors)
     uniq_comp_pair <- (form_W_new[D[,1],,drop = F] + form_W_new[D[,2],,drop = F]) %*% lambda
     #uniq_comp <- form_W_new %*% lambda
   } else {
@@ -230,7 +232,7 @@ coef_to_pred <- function(obj, intercept, beta, lambda, u,
 
 
   if ((length(beta) > 0) & !is.null(new_X)) {
-    form_X_new <- as.matrix(forge(new_X, obj$form_X$blueprint)$predictors)
+    form_X_new <- as.matrix(hardhat::forge(new_X, obj$form_X$blueprint)$predictors)
     diss_comp = abs(form_X_new[D[,1],, drop = F] - form_X_new[D[,2],,drop = F]) %*% beta
   } else {
     diss_comp = 0

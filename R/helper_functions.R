@@ -23,7 +23,7 @@ print_title <- function(text, symb = '-', width = getOption("width")) {
 }
 
 
-#' Nice titles for summary tables
+#' Centered title with decorated side
 #'
 #' @param text Title to display
 #' @param width Size of the console. Defaults to current width.
@@ -67,4 +67,16 @@ bray1 <- function(x,y){
 }
 
 
+
+#' Inverse logit
+#'
+#' @param x 	A numeric value or vector
+#' @description
+#' Performs inverse of logit: exp(x) / (1 + exp(x))
+#'
+#' @return A (transformed) numeric value or vector
+#' @export
+inv_logit <- function(x) {
+  exp(x) / (1 + exp(x))
+}
 

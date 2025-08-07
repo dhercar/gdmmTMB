@@ -25,7 +25,13 @@
 #'
 #' @importFrom hardhat mold default_formula_blueprint
 #' @importFrom lme4 nobars
-#' @importFrom Matrix sparseMatrix
+#' @importFrom Matrix sparseMatrix sparse.model.matrix
+#' @importFrom TMB MakeADFun sdreport
+#' @importFrom parallel detectCores makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach %dopar%
+#' @importFrom gtools rdirichlet
+#' @importFrom stats nlminb terms
 
 gdmm <- function(Y = NULL,
                  Y_diss = NULL,
@@ -88,7 +94,7 @@ gdmm <- function(Y = NULL,
     vars_form <- all.vars(diss_formula)
     is_numeric_X <- apply(X[,vars_form, drop = F], 2, is.numeric)
     if (!all(is_numeric_X)) {
-      stop(pate0("Variables included in 'diss_formula' are not numeric: ", paste(vars_form[!is_numeric_X], collapse = ', ')))
+      stop(paste0("Variables included in 'diss_formula' are not numeric: ", paste(vars_form[!is_numeric_X], collapse = ', ')))
     }
   }
 
@@ -148,7 +154,7 @@ gdmm <- function(Y = NULL,
   # Re model matrix
   map = list()
   if (length(re_vars) > 0) {
-    Z_design <- sparse.model.matrix(eval(parse(text = paste0('~ 0 + ', paste0(re_vars, collapse = ' + ')))),
+    Z_design <- Matrix::sparse.model.matrix(eval(parse(text = paste0('~ 0 + ', paste0(re_vars, collapse = ' + ')))),
                              data = X)
     has_re = 1
     map_re <- as.numeric(as.factor(unlist(lapply(re_vars, function(x) rep(x, length(unique(X[[x]])))))))
@@ -198,7 +204,7 @@ gdmm <- function(Y = NULL,
 
   parameters <- list(
     intercept = 0,
-    beta = rep(-2, ncol(form_X$predictors))*mono,
+    beta = rep(0, ncol(form_X$predictors)),
     lambda = rep(0, ncol(form_W$predictors)),
     log_sigma_re = rep(0, length(re_vars)),
     u = rep(0, ncol(Z_design)*has_re),
@@ -217,10 +223,10 @@ gdmm <- function(Y = NULL,
   if (bboot == FALSE) {
     data[['weights']] <- rep(1, length(Y_diss))
 
-    obj <- MakeADFun(
+    obj <- TMB::MakeADFun(
       data = data,
       parameters = parameters,
-      DLL = 'gdum',
+      DLL = 'gdmmTMB',
       map = map,
       random = 'u',
       silent = !trace
@@ -228,7 +234,7 @@ gdmm <- function(Y = NULL,
 
     n_par <- length(obj$par)
     lower_bounds <- rep(-Inf, n_par)
-    upper_bounds <- rep( Inf, n_par)
+    upper_bounds <- rep(Inf, n_par)
 
     if (mono) {
       #lower_bounds[names(obj$par) == 'beta'] <- 0
@@ -258,7 +264,6 @@ gdmm <- function(Y = NULL,
                   uniq_formula = uniq_formula,
                   link = link,
                   family = family,
-                  sdrep = sdreport(obj,getJointPrecision = TRUE),
                   obj = obj,
                   opt = opt,
                   boot = FALSE,
@@ -276,10 +281,6 @@ gdmm <- function(Y = NULL,
     registerDoParallel(cl)
     on.exit(stopCluster(cl))
 
-    clusterEvalQ(cl, {
-      dyn.load(TMB::dynlib('TMB/gdum'))
-      NULL
-    })
 
     cat('Running bayesian bootstrapping on', n_cores, 'cores ...')
 
@@ -294,7 +295,7 @@ gdmm <- function(Y = NULL,
       obj <- MakeADFun(
         data = data,
         parameters = parameters,
-        DLL = 'gdum',
+        DLL = 'gdmmTMB',
         map = map,
         random = 'u',
         silent = !trace

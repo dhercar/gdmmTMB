@@ -1,30 +1,38 @@
+#' Summary method for gdmm objects
+#'
+#' S3 method for summarizing gdmm model fits.
+#'
+#' @param obj An object of class \code{gdmm}.
+#' @return An object of class \code{summary.gdmm}.
+#' @method summary gdmm
 summary.gdmm <- function(obj) {
-    
+
     # Get coefficient table with p-values
-    coef_table <- summary(obj$sdrep, select = c('report'), p.value = TRUE)
-    
+    sdr <- TMB::sdreport(obj$obj)
+    coef_table <- TMB::summary.sdreport(sdr, select = c('report'), p.value = TRUE)
+
     # Add significance stars
     p_values <- coef_table[, "Pr(>|z^2|)"]
     sig_stars <- ifelse(p_values < 0.001, "***",
                         ifelse(p_values < 0.01, "**",
                                ifelse(p_values < 0.05, "*",
                                       ifelse(p_values < 0.1, ".", " "))))
-    
+
     # Create data.frame with lm-style column names and add significance stars
     result <- as.data.frame(coef_table)
 
-    
-    # Calculate AIC 
+
+    # Calculate AIC
     m_AIC <- AICc(log_likelihood = -obj$opt$objective,
                   n = length(obj$Y_diss),
                   k = length(obj$opt$par))
     m_BIC <- BIC2(log_likelihood = -obj$opt$objective,
                   n = length(obj$Y_diss),
                   k = length(obj$opt$par))
-    
+
     out <- list(call = obj$call,
                 mono = obj$mono,
-                table = coef_table, 
+                table = coef_table,
                 p_values = p_values,
                 names_beta =  paste0('diss: ', colnames(obj$form_X$predictors)),
                 names_lambda =  paste0('uniq: ', colnames(obj$form_W$predictors)),
@@ -37,33 +45,41 @@ summary.gdmm <- function(obj) {
     return(out)
 }
 
-
-summary.bbgdmm <- function(obj, 
+#' Summary method for bbgdmm objects
+#'
+#' S3 method for summarizing bbgdmm model fits.
+#'
+#' @param obj An object of class \code{bbgdmm}.
+#' @param quantiles A numeric vector of quantiles to display.
+#' @param null_value Value used for pseudo p-value tests.
+#' @return An object of class \code{summary.bbgdmm}.
+#' @method summary bbgdmm
+summary.bbgdmm <- function(obj,
                          quantiles = c(0.025, 0.5, 0.975),
                          null_value = 0) {
-  
-  # Basic statistics 
+
+  # Basic statistics
   samples <- obj$boot_samples[, (colnames(obj$boot_samples) != 'logLikelihood') & (substr(colnames(obj$boot_samples), 1,5) != 'u_re_')]
 
   logL <- mean(obj$boot_samples[,'logLikelihood'])
-  
-  # Calculate AIC 
+
+  # Calculate AIC
   m_AIC <- AICc(log_likelihood = logL,
                 n = length(obj$Y_diss),
                 k = ncol(samples))
   m_BIC <- BIC2(log_likelihood = logL,
                 n = length(obj$Y_diss),
                 k = ncol(samples))
-  
+
   means <- apply(samples, 2, mean)
   sds <- apply(samples, 2, sd)
-  
+
   # Quantiles
   CI <- t(apply(samples,2, function(x) quantile(x, probs = quantiles)))
-  
+
   # Pseudo Z
   pseudo_z <- (means - null_value) / sds
-  
+
   # Pseudo P
   pseudo_p <- apply(samples, 2, function(x) {
     n <- length(x)
@@ -71,14 +87,14 @@ summary.bbgdmm <- function(obj,
     side <- sign(obs_mean - null_value)
     return(sum( (x - null_value)*side < null_value) / n)
   })
-  
-  
+
+
   sig_stars <- ifelse(pseudo_p < 0.001, "***",
                       ifelse(pseudo_p < 0.01, "**",
                              ifelse(pseudo_p < 0.05, "*",
                                     ifelse(pseudo_p < 0.1, ".", " "))))
-  
-  out <- list(call = obj$call, 
+
+  out <- list(call = obj$call,
               mono = obj$mono,
               estimate = means,
               sds = sds,
@@ -94,17 +110,24 @@ summary.bbgdmm <- function(obj,
               names_lambda =  paste0('uniq: ', colnames(obj$form_W$predictors)),
               sig = sig_stars,
               logL = logL)
-  
+
   class(out) <- 'summary.bbgdmm'
   return(out)
 }
 
-print.summary.gdmm <- function(x, ...) {
+#' Print method for summary.gdmm
+#'
+#' Internal print method for objects of class \code{summary.gdmm}.
+#'
+#' @param x An object of class \code{summary.gdmm}.
+#' @method print summary.gdmm
+#' @noRd
+print.summary.gdmm <- function(x) {
   print_title('GDMM SUMMARY', symb = '—')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
   cat(" ", call_str, "\n\n", sep = '')
-  
+
   # table
   cat("coeff. summary table:\n\n")
   rownames(x$table)[rownames(x$table) == 'e_beta'] <- x$names_beta
@@ -113,9 +136,9 @@ print.summary.gdmm <- function(x, ...) {
   x$table <- data.frame(x$table, x$sig)
   names(x$table) <-  c("Estimate", "Std.Err.", "z value", "Pr(>|z^2|)", " ")
   print(x$table, digits = 3)
-  
+
   if (x$mono) message('\nCAUTION: P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"')
-  
+
   cat("---\n")
   cat("signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 \n")
   cat("---\n\n")
@@ -125,20 +148,26 @@ print.summary.gdmm <- function(x, ...) {
   print_title2('', symb = '—')
 }
 
-
-print.summary.bbgdmm <- function(x, ...) {
+#' Print method for summary.bbgdmm
+#'
+#' Internal print method for objects of class \code{summary.bbgdmm}.
+#'
+#' @param x An object of class \code{summary.bbgdmm}.
+#' @method print summary.bbgdmm
+#' @noRd
+print.summary.bbgdmm <- function(x) {
   print_title('BBGDMM SUMMARY', symb = '—')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
   cat(" ", call_str, "\n\n", sep = '')
-  
+
   # table
   print_title2(" Coeff. Table ", symb = '-')
   rownames(x$CI)[rownames(x$CI) == 'e_beta'] <- x$names_beta
   rownames(x$CI)[rownames(x$CI)  == 'lambda'] <- x$names_lambda
   rownames(x$CI)[rownames(x$CI)  == 'intercept'] <- '(Intercept)'
   colnames(x$CI) <-  paste0(x$quantiles*100, '%')
-  
+
   table <- data.frame(x$estimate,
                       x$sds,
                       x$CI,
@@ -147,9 +176,9 @@ print.summary.bbgdmm <- function(x, ...) {
                       x$sig)
   names(table) <- c('Estimate', 'Std.Err.', paste0(x$quantiles*100,'%'), 'pseudo-Z', 'pseudo-Pval', ' ')
   print(table, digits = 4)
-  
+
   if (x$mono) message('\nCAUTION: pseudo P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"')
-  
+
   cat("---\n")
   cat("signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 \n")
   cat("---\n\n")
