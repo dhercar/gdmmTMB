@@ -7,12 +7,11 @@
 isp(x, degree = 2, ...)
 }
 \arguments{
-\item{x}{The predictor variable.  Missing values are allowed and will be
-returned as they are.}
+\item{x}{A numeric vector.}
 
 \item{degree}{Spline degree; defaults to 2 here (instead of 3).}
 
-\item{...}{Optional arguments that are not used.}
+\item{...}{additional parameters passed to \code{splines2::isp}}
 }
 \description{
 A thin wrapper around \code{splines2::isp()}. Uses \code{degree = 2}

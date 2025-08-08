@@ -19,6 +19,3 @@ A \code{character} string (invisibly returned)
 \description{
 Centered title with decorated side
 }
-\examples{
-print_title2(' hello world ', ':')
-}

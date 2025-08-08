@@ -4,7 +4,7 @@
 \alias{print.gdmm}
 \title{Print method for gdmm objects}
 \usage{
-\method{print}{gdmm}(m, ...)
+\method{print}{gdmm}(m)
 }
 \arguments{
 \item{m}{A fitted model object of class \code{gdmm}}

@@ -5,7 +5,7 @@
 #' This method can predict dissimilarity or uniqueness for new data,
 #' with optional confidence intervals. Works with both regular gdmm and bootstrap bbgdmm objects.
 #'
-#' @param object A fitted model object of class 'gdmm' or 'bbgdmm'
+#' @param obj A fitted model object of class 'gdmm' or 'bbgdmm'
 #' @param new_X A data frame or matrix of new predictor variables for the dissimilarity component.
 #'   If NULL (default), uses the original data from the fitted model.
 #' @param new_W A data frame or matrix of new predictor variables for the uniqueness component.
@@ -43,6 +43,9 @@
 #' values based on the full dissimilarity matrix. When \code{component = "dissimilarity"},
 #' it returns pairwise dissimilarity predictions.
 #' @importFrom hardhat forge
+#' @importFrom MASS mvrnorm
+#' @importFrom stats rnorm quantile
+#' @importFrom utils combn
 #' @export
 #'
 predict.gdmm <- function(obj,
@@ -71,7 +74,7 @@ predict.gdmm <- function(obj,
   n <- max(nrow(new_X), nrow(new_W), nrow(new_re))
 
   # sample combinations
-  D <- t(combn(n, 2))
+  D <- t(utils::combn(n, 2))
 
   # ----- EXPECTED VALUE -----
   if (class(obj) == 'gdmm') {
@@ -140,7 +143,7 @@ predict.gdmm <- function(obj,
     }
 
     quantiles <- sort(c((1-CI_quant)*0.5, CI_quant + (1-CI_quant)*0.5))
-    CI <- t(apply(do.call(cbind, pred_list), 1, function(x) quantile(x, quantiles)))
+    CI <- t(apply(do.call(cbind, pred_list), 1, function(x) stats::quantile(x, quantiles)))
     out <- cbind(mean = out, CI = CI)
     colnames(out) <- c('mean', paste0('CI ', colnames(CI)))
   }
@@ -154,7 +157,7 @@ predict.gdmm <- function(obj,
 #' This method can predict dissimilarity or uniqueness for new data,
 #' with optional confidence intervals. Works with both regular gdmm and bootstrap bbgdmm objects.
 #'
-#' @param object A fitted model object of class 'gdmm' or 'bbgdmm'
+#' @param obj A fitted model object of class 'gdmm' or 'bbgdmm'
 #' @param new_X A data frame or matrix of new predictor variables for the dissimilarity component.
 #'   If NULL (default), uses the original data from the fitted model.
 #' @param new_W A data frame or matrix of new predictor variables for the uniqueness component.
@@ -251,7 +254,7 @@ coef_to_pred <- function(obj, intercept, beta, lambda, u,
     re_comp_pair <- re_comp[D[,1]] + re_comp[D[,2]]
 
   } else if (length(sigma) > 0 && !is.null(sigma)) {
-    re_comp_pair <- rowSums(do.call(cbind, lapply(rep(sigma,2), function(x) rnorm(nrow(obj$D), 0, sigma))))
+    re_comp_pair <- rowSums(do.call(cbind, lapply(rep(sigma,2), function(x) stats::rnorm(nrow(obj$D), 0, sigma))))
   } else {
     re_comp_pair <- 0
   }

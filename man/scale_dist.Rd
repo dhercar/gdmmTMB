@@ -2,26 +2,18 @@
 % Please edit documentation in R/helper_functions.R
 \name{scale_dist}
 \alias{scale_dist}
-\title{Scale a \link{0, 1} vector into an arbitrary subinterval}
+\title{Scale a vector into an specified}
 \usage{
 scale_dist(x, new = c(0.01, 0.99))
 }
 \arguments{
-\item{x}{A numeric vector with values expected in [0, 1].}
+\item{x}{A numeric vector}
 
 \item{new}{Numeric scalar: the upper nad lower bound of the target interval. Default is [\code{0.01}, \code{0.99}].}
 }
 \value{
-A numeric vector of the same length as \code{x}, with values in the interval [\code{min}, \code{max}].
+A numeric vector of the same length as \code{x}, with values in the interval [\code{min(new)}, \code{max(new)}].
 }
 \description{
 Given a numeric vector \code{x}, this function re-scales \code{x} into the interval [\code{min}, \code{max}].
-}
-\examples{
-\dontrun{
-  # first scale to [0,1], then to [0.1, 0.9]
-  v <- c(5, 15, 25)
-  v01 <- scale01(v)
-  scale_dist(v01, min = 0.1, max = 0.9)
-}
 }

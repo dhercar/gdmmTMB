@@ -5,13 +5,6 @@
 #' @param log_likelihood The log-likelihood of the model
 #' @param n The number of observations
 #' @param k The number of estimated parameters
-
-#' @examples
-#' # Example usage
-#' log_likelihood <- -150
-#' n <- 50
-#' k <- 5
-#' AICc(log_likelihood, n, k)
 AICc <- function(log_likelihood, # model log-likelihood,
                  n,              # n samples
                  k) {            # k parameters estimated
@@ -30,13 +23,6 @@ AICc <- function(log_likelihood, # model log-likelihood,
 #' @param log_likelihood The log-likelihood of the model
 #' @param n The number of observations
 #' @param k The number of estimated parameters
-#'
-#' @examples
-#' # Example usage of BICcalc function
-#' log_likelihood <- -150
-#' n <- 100
-#' k <- 5
-#' BICcalc(log_likelihood, n, k)
 BIC2 <- function(log_likelihood, # model log-likelihood,
                  n,              # n samples
                  k) {             # k parameters estimated

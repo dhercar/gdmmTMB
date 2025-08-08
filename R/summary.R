@@ -2,13 +2,15 @@
 #'
 #' S3 method for summarizing gdmm model fits.
 #'
-#' @param obj An object of class \code{gdmm}.
+#' @param object An object of class \code{gdmm}.
+#' @param ... additional arguments (not used)
 #' @return An object of class \code{summary.gdmm}.
 #' @method summary gdmm
-summary.gdmm <- function(obj) {
+#' @export
+summary.gdmm <- function(object, ...) {
 
     # Get coefficient table with p-values
-    sdr <- TMB::sdreport(obj$obj)
+    sdr <- TMB::sdreport(object$obj)
     coef_table <- TMB::summary.sdreport(sdr, select = c('report'), p.value = TRUE)
 
     # Add significance stars
@@ -23,24 +25,24 @@ summary.gdmm <- function(obj) {
 
 
     # Calculate AIC
-    m_AIC <- AICc(log_likelihood = -obj$opt$objective,
-                  n = length(obj$Y_diss),
-                  k = length(obj$opt$par))
-    m_BIC <- BIC2(log_likelihood = -obj$opt$objective,
-                  n = length(obj$Y_diss),
-                  k = length(obj$opt$par))
+    m_AIC <- AICc(log_likelihood = -object$opt$objective,
+                  n = length(object$Y_diss),
+                  k = length(object$opt$par))
+    m_BIC <- BIC2(log_likelihood = -object$opt$objective,
+                  n = length(object$Y_diss),
+                  k = length(object$opt$par))
 
-    out <- list(call = obj$call,
-                mono = obj$mono,
+    out <- list(call = object$call,
+                mono = object$mono,
                 table = coef_table,
                 p_values = p_values,
-                names_beta =  paste0('diss: ', colnames(obj$form_X$predictors)),
-                names_lambda =  paste0('uniq: ', colnames(obj$form_W$predictors)),
+                names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
+                names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
                 sig = sig_stars,
                 AIC = m_AIC$AIC,
                 AICc = m_AIC$AICc,
                 BIC = m_BIC,
-                logL = -obj$opt$objective)
+                logL = -object$opt$objective)
     class(out) <- 'summary.gdmm'
     return(out)
 }
@@ -49,30 +51,34 @@ summary.gdmm <- function(obj) {
 #'
 #' S3 method for summarizing bbgdmm model fits.
 #'
-#' @param obj An object of class \code{bbgdmm}.
+#' @param object An object of class \code{bbgdmm}.
 #' @param quantiles A numeric vector of quantiles to display.
 #' @param null_value Value used for pseudo p-value tests.
+#' @param ... additional arguments (not used)
+#'
 #' @return An object of class \code{summary.bbgdmm}.
 #' @method summary bbgdmm
-summary.bbgdmm <- function(obj,
+#' @importFrom stats sd
+#' @export
+summary.bbgdmm <- function(object,
                          quantiles = c(0.025, 0.5, 0.975),
-                         null_value = 0) {
+                         null_value = 0, ...) {
 
   # Basic statistics
-  samples <- obj$boot_samples[, (colnames(obj$boot_samples) != 'logLikelihood') & (substr(colnames(obj$boot_samples), 1,5) != 'u_re_')]
+  samples <- object$boot_samples[, (colnames(object$boot_samples) != 'logLikelihood') & (substr(colnames(object$boot_samples), 1,5) != 'u_re_')]
 
-  logL <- mean(obj$boot_samples[,'logLikelihood'])
+  logL <- mean(object$boot_samples[,'logLikelihood'])
 
   # Calculate AIC
   m_AIC <- AICc(log_likelihood = logL,
-                n = length(obj$Y_diss),
+                n = length(object$Y_diss),
                 k = ncol(samples))
   m_BIC <- BIC2(log_likelihood = logL,
-                n = length(obj$Y_diss),
+                n = length(object$Y_diss),
                 k = ncol(samples))
 
   means <- apply(samples, 2, mean)
-  sds <- apply(samples, 2, sd)
+  sds <- apply(samples, 2, stats::sd)
 
   # Quantiles
   CI <- t(apply(samples,2, function(x) quantile(x, probs = quantiles)))
@@ -94,20 +100,20 @@ summary.bbgdmm <- function(obj,
                              ifelse(pseudo_p < 0.05, "*",
                                     ifelse(pseudo_p < 0.1, ".", " "))))
 
-  out <- list(call = obj$call,
-              mono = obj$mono,
+  out <- list(call = object$call,
+              mono = object$mono,
               estimate = means,
               sds = sds,
               pseudo_zval = pseudo_z,
               pseudo_pval = pseudo_p,
               CI = CI,
-              n_boot = obj$n_boot,
+              n_boot = object$n_boot,
               quantiles = quantiles,
               AIC = m_AIC$AIC,
               AICc = m_AIC$AICc,
               BIC = m_BIC,
-              names_beta =  paste0('diss: ', colnames(obj$form_X$predictors)),
-              names_lambda =  paste0('uniq: ', colnames(obj$form_W$predictors)),
+              names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
+              names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
               sig = sig_stars,
               logL = logL)
 
@@ -123,7 +129,7 @@ summary.bbgdmm <- function(obj,
 #' @method print summary.gdmm
 #' @noRd
 print.summary.gdmm <- function(x) {
-  print_title('GDMM SUMMARY', symb = '—')  # call
+  print_title('GDMM SUMMARY', symb = '-')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
   cat(" ", call_str, "\n\n", sep = '')
@@ -145,7 +151,7 @@ print.summary.gdmm <- function(x) {
   # logL, AIC, AICc, and BIC
   cat("Marginal log-likelihood: ", x$logL, "\nAIC: ", x$AIC, ", AICc: ", x$AICc, ", BIC: ", x$BIC, "\n")
   cat('\n')
-  print_title2('', symb = '—')
+  print_title2('', symb = '-')
 }
 
 #' Print method for summary.bbgdmm
@@ -156,7 +162,7 @@ print.summary.gdmm <- function(x) {
 #' @method print summary.bbgdmm
 #' @noRd
 print.summary.bbgdmm <- function(x) {
-  print_title('BBGDMM SUMMARY', symb = '—')  # call
+  print_title('BBGDMM SUMMARY', symb = '-')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
   cat(" ", call_str, "\n\n", sep = '')
@@ -184,6 +190,6 @@ print.summary.bbgdmm <- function(x) {
   cat("---\n\n")
   cat("Marginal log-likelihood (average): ", x$logL, "\nAIC: ", x$AIC, ", AICc: ", x$AICc, ", BIC: ", x$BIC, "\n")
   cat('\n')
-  print_title2('', symb = '—')
+  print_title2('', symb = '-')
 }
 

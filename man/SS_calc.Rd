@@ -33,8 +33,8 @@ SS_calc(d, TRUE)   # LCBD-like values
 }
 \references{
 Legendre, P., & De Cáceres, M. (2013). Beta diversity as the variance of community data:
-dissimilarity coefficients and partitioning. \emph{Ecology Letters}, 16(8), 951–963.
-\doi{10.1111/ele.12141}
+dissimilarity coefficients and partitioning. Ecology Letters, 16(8), 951–963.
+DOI:10.1111/ele.12141
 }
 \seealso{
 \code{\link[adespatial]{LCBD.comp}}

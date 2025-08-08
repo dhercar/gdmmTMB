@@ -36,6 +36,7 @@
 #'
 #' @importFrom hardhat forge
 #' @importFrom TMB sdreport
+#' @importFrom stats quantile
 #'
 #' @export
 diss_gradient <- function(m,
@@ -104,7 +105,7 @@ diss_gradient <- function(m,
         })
       }))
 
-      CI_i <- t(apply(samples, 1, function(x){quantile(x, probs = quantiles)}))
+      CI_i <- t(apply(samples, 1, function(x){stats::quantile(x, probs = quantiles)}))
       colnames(CI_i) <- c(paste0('CI ', colnames(CI_i)))
 
       out_i <- cbind(out_i, CI_i)

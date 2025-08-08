@@ -16,10 +16,3 @@ AICc(log_likelihood, n, k)
 \description{
 Calculates the Akaike Information Criterion corrected for small sample sizes (AICc).
 }
-\examples{
-# Example usage
-log_likelihood <- -150
-n <- 50
-k <- 5
-AICc(log_likelihood, n, k)
-}

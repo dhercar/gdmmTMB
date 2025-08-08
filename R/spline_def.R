@@ -4,8 +4,10 @@
 #' A thin wrapper around `splines2::isp()`. Uses `degree = 2`
 #' unless otherwise specified. All other arguments are passed through.
 #'
-#' @inheritParams splines2::isp
+#' @importFrom splines2 isp
+#' @param x A numeric vector.
 #' @param degree Spline degree; defaults to 2 here (instead of 3).
+#' @param ... additional parameters passed to \code{splines2::isp}
 #' @export
 
 isp <- function(x, degree = 2, ...) {

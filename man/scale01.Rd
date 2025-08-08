@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{scale01}
 \alias{scale01}
-\title{Scale a numeric vector to \link{0, 1}}
+\title{Scale a numeric vector 0,1}
 \usage{
 scale01(x)
 }
@@ -14,10 +14,4 @@ A numeric vector of the same length as \code{x}, with values in the interval [0,
 }
 \description{
 Takes a numeric vector and linearly rescales it so that its minimum becomes 0 and its maximum becomes 1.
-}
-\examples{
-\dontrun{
-  scale01(c(10, 20, 30))
-  #> 0.0, 0.5, 1.0
-}
 }

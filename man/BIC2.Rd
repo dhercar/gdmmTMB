@@ -16,10 +16,3 @@ BIC2(log_likelihood, n, k)
 \description{
 Calculates the Bayesian Information Criterion (BIC).
 }
-\examples{
-# Example usage of BICcalc function
-log_likelihood <- -150
-n <- 100
-k <- 5
-BICcalc(log_likelihood, n, k)
-}

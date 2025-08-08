@@ -4,7 +4,7 @@
 \alias{print.bbgdmm}
 \title{Print method for bbgdmm objects}
 \usage{
-\method{print}{bbgdmm}(m, ...)
+\method{print}{bbgdmm}(m)
 }
 \arguments{
 \item{m}{A fitted model object of class \code{bbgdmm}}

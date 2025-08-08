@@ -363,8 +363,8 @@ gdmm <- function(Y = NULL,
 #'
 #' @method print gdmm
 
-print.gdmm <- function(m, ...){
-  print_title('Generalized dissimilarity mixed model (GDMM)', symb = '—')  # call
+print.gdmm <- function(m){
+  print_title('Generalized dissimilarity mixed model (GDMM)', symb = '-')  # call
 
   cat('convergence:', ifelse(m$opt$convergence == 0, 'succesful convergence\n', 'optimization has not reached succesful convergence\n'))
   cat('nlminb message: ')
@@ -411,8 +411,8 @@ print.gdmm <- function(m, ...){
 #'
 #' @method print bbgdmm
 
-print.bbgdmm <- function(m, ...){
-  print_title('Generalized dissimilarity mixed model (GDMM)', symb = '—')  # call
+print.bbgdmm <- function(m){
+  print_title('Generalized dissimilarity mixed model (GDMM)', symb = '-')  # call
 
   cat('Bayesian Bootstrapping with', m$n_boot, 'random samples\n\n')
 
@@ -445,7 +445,7 @@ print.bbgdmm <- function(m, ...){
   cat(ifelse(length(m$re_vars) > 0, paste(m$re_vars,sep = ' ,'), 'none included \n'))
 
   cat('\n')
-  print_title2('', symb = '—')
+  print_title2('', symb = '-')
 }
 
 

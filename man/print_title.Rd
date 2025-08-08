@@ -19,6 +19,3 @@ A \code{character} string (invisibly returned)
 \description{
 Nice titles for summary tables
 }
-\examples{
-print_title('hello world', '=')
-}

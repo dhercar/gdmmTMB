@@ -6,8 +6,6 @@
 #'
 #' @return A `character` string (invisibly returned)
 #'
-#' @examples print_title('hello world', '=')
-
 print_title <- function(text, symb = '-', width = getOption("width")) {
   # Full-width line of dashes
   separator_line <- strrep(symb, width)
@@ -30,9 +28,6 @@ print_title <- function(text, symb = '-', width = getOption("width")) {
 #' @param symb Symbol used left and right of the title
 #'
 #' @return A `character` string (invisibly returned)
-#'
-#' @examples print_title2(' hello world ', ':')
-
 print_title2 <- function(text, symb = '-', width = getOption("width")) {
   total_padding <- width - nchar(text)
   if (total_padding < 0) total_padding <- 0
@@ -58,8 +53,6 @@ print_title2 <- function(text, symb = '-', width = getOption("width")) {
 #'   \item num - numerator: sum of absolute differences between x and y
 #'   \item den - denominator: sum of x and y values
 #' }
-#' @examples bray1(c(0,1,1), c(1,1,0))
-
 bray1 <- function(x,y){
   num = sum(abs(x - y))
   den = sum(x,y)
@@ -80,37 +73,25 @@ inv_logit <- function(x) {
 }
 
 
-#' Scale a numeric vector to [0, 1]
+#' Scale a numeric vector 0,1
 #'
 #' Takes a numeric vector and linearly rescales it so that its minimum becomes 0 and its maximum becomes 1.
 #'
 #' @param x A numeric vector.
 #' @return A numeric vector of the same length as \code{x}, with values in the interval \[0, 1\].
-#' @examples
-#' \dontrun{
-#'   scale01(c(10, 20, 30))
-#'   #> 0.0, 0.5, 1.0
-#' }
 scale01 <- function(x) {
   rng <- range(x, na.rm = TRUE)
   (x - rng[1]) / (rng[2] - rng[1])
 }
 
 
-#' Scale a [0, 1] vector into an arbitrary subinterval
+#' Scale a vector into an specified
 #'
 #' Given a numeric vector \code{x}, this function re-scales \code{x} into the interval \[\code{min}, \code{max}\].
 #'
-#' @param x A numeric vector with values expected in \[0, 1\].
+#' @param x A numeric vector
 #' @param new Numeric scalar: the upper nad lower bound of the target interval. Default is \[\code{0.01}, \code{0.99}\].
-#' @return A numeric vector of the same length as \code{x}, with values in the interval \[\code{min}, \code{max}\].
-#' @examples
-#' \dontrun{
-#'   # first scale to [0,1], then to [0.1, 0.9]
-#'   v <- c(5, 15, 25)
-#'   v01 <- scale01(v)
-#'   scale_dist(v01, min = 0.1, max = 0.9)
-#' }
+#' @return A numeric vector of the same length as \code{x}, with values in the interval \[\code{min(new)}, \code{max(new)}\].
 scale_dist <- function(x, new = c(0.01, 0.99)) {
   min(new) + x * (max(new) - min(new))
 }

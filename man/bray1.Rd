@@ -22,6 +22,3 @@ A named numeric vector with two elements:
 Calculate the numerator and denominator components of the Bray-Curtis dissimilarity index.
 The Bray-Curtis dissimilarity is calculated as \eqn{\frac{\sum_{i} |x_i - y_i|}{\sum_{i} (x_i + y_i)}}
 }
-\examples{
-bray1(c(0,1,1), c(1,1,0))
-}
