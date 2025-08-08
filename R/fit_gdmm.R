@@ -32,6 +32,7 @@
 #' @importFrom foreach foreach %dopar%
 #' @importFrom gtools rdirichlet
 #' @importFrom stats nlminb terms
+#' @useDynLib gdmmTMB, .registration = TRUE
 
 gdmm <- function(Y = NULL,
                  Y_diss = NULL,
