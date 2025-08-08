@@ -75,8 +75,43 @@ bray1 <- function(x,y){
 #' Performs inverse of logit: exp(x) / (1 + exp(x))
 #'
 #' @return A (transformed) numeric value or vector
-#' @export
 inv_logit <- function(x) {
   exp(x) / (1 + exp(x))
+}
+
+
+#' Scale a numeric vector to [0, 1]
+#'
+#' Takes a numeric vector and linearly rescales it so that its minimum becomes 0 and its maximum becomes 1.
+#'
+#' @param x A numeric vector.
+#' @return A numeric vector of the same length as \code{x}, with values in the interval \[0, 1\].
+#' @examples
+#' \dontrun{
+#'   scale01(c(10, 20, 30))
+#'   #> 0.0, 0.5, 1.0
+#' }
+scale01 <- function(x) {
+  rng <- range(x, na.rm = TRUE)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+
+
+#' Scale a [0, 1] vector into an arbitrary subinterval
+#'
+#' Given a numeric vector \code{x}, this function re-scales \code{x} into the interval \[\code{min}, \code{max}\].
+#'
+#' @param x A numeric vector with values expected in \[0, 1\].
+#' @param new Numeric scalar: the upper nad lower bound of the target interval. Default is \[\code{0.01}, \code{0.99}\].
+#' @return A numeric vector of the same length as \code{x}, with values in the interval \[\code{min}, \code{max}\].
+#' @examples
+#' \dontrun{
+#'   # first scale to [0,1], then to [0.1, 0.9]
+#'   v <- c(5, 15, 25)
+#'   v01 <- scale01(v)
+#'   scale_dist(v01, min = 0.1, max = 0.9)
+#' }
+scale_dist <- function(x, new = c(0.01, 0.99)) {
+  min(new) + x * (max(new) - min(new))
 }
 

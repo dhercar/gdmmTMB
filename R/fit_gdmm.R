@@ -10,7 +10,7 @@
 #' @param mono Logical. If TRUE, enforces monotonic (non-decreasing) dissimilarity effects. Default is FALSE.
 #' @param family Distribution family for the response. One of "normal", "binomial", or "beta". Default is "normal".
 #' @param link Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.
-#' @param replace_01 Numeric vector of length 2 specifying replacement values for dissimilarity values of exactly 0 and 1. Default is c(0,1). ToDo: replace with re-scale
+#' @param scale_diss Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values.
 #' @param binary Logical. Whether to treat response as binary data before calculating dissimilarity from Y. Default is FALSE.
 #' @param method Dissimilarity method applied to Y. One of "bray", "sorensen", "jaccard". Default is "bray".
 #' @param control List of control parameters passed to nlminb optimizer (e.g., `control = list(rel.tol = 1e-8, iter.max = 500)`).
@@ -44,7 +44,7 @@ gdmm <- function(Y = NULL,
                  mono = FALSE,
                  family = 'normal',
                  link = NULL,
-                 replace_01 = c(0,1),
+                 scale_diss = NULL,
                  binary = FALSE,
                  method = 'bray',
                  control = NULL,
@@ -62,14 +62,14 @@ gdmm <- function(Y = NULL,
     message("Both 'Y' and 'Y_diss' provided. Ignoring 'Y'")
   }
 
-  # D presetn if Y_diss
+  # D present if Y_diss
   if (!is.null(Y_diss) && is.null(D) && is.null(Y)) {
     stop("When 'Y_diss' is provided, 'D' must also be provided")
   }
 
   # Y_den present if needed
   if (!is.null(Y_diss) && family == "binomial" && (is.null(Y_den) || Y_den == 0)) {
-    stop("When using 'Y_diss' with binomial family, 'Y_den' must be provided and > 0")
+    stop("When using 'Y_diss' with binomial family, 'Y_den' must be provided")
   }
 
   # Check Y format
@@ -77,6 +77,10 @@ gdmm <- function(Y = NULL,
     if (!is.matrix(Y) && !is.data.frame(Y)) {
       stop("'Y' must be a matrix or data frame")
     }
+  }
+
+  if (!(is.null(scale_diss) || (length(scale_diss) == 2))) {
+    stop("'scale_diss' must be a vector of length 2")
   }
 
   # Check family
@@ -109,12 +113,12 @@ gdmm <- function(Y = NULL,
 
   # Check link
   valid_link <- c("identity", "logit", "neg_exp", 'neg_gaus')
-  if (!family %in% valid_families ) {
-    stop(paste("'family' must be one of:", paste(valid_families, collapse = ", ")))
+  if (!link %in% valid_link ) {
+    stop(paste("'family' must be one of:", paste(valid_link, collapse = ", ")))
   }
 
   # Numeric codes for fam and link
- family_num <- switch(family,
+  family_num <- switch(family,
                        'normal' = 0,
                        'binomial' = 1,
                        'beta' = 2)
@@ -187,8 +191,9 @@ gdmm <- function(Y = NULL,
     }
   }
 
-  Y_diss <- ifelse(Y_diss == 0, min(replace_01), ifelse(Y_diss == 1, max(replace_01), Y_diss))
-
+  if(!is.null(scale_diss)){
+    Y_diss <- scale_dist(Y_diss, scale_diss)
+  }
 
   data <- list(
     Y = Y_diss,
@@ -217,7 +222,9 @@ gdmm <- function(Y = NULL,
                       trace = 0)
 
   if (!is.null(control)) {
-    control_def[[names(control)]] <- control
+    for (nm in names(control)) {
+      control_def[[nm]] <- control[[nm]]
+    }
   }
 
 
@@ -275,7 +282,6 @@ gdmm <- function(Y = NULL,
       return(out)
 
   } else if (bboot == TRUE) {
-    require(doParallel)
     if (is.null(n_cores))  n_cores = parallel::detectCores(logical = TRUE) - 2
 
     cl <- makeCluster(n_cores)

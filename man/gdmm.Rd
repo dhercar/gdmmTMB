@@ -15,7 +15,7 @@ gdmm(
   mono = FALSE,
   family = "normal",
   link = NULL,
-  replace_01 = c(0, 1),
+  scale_diss = NULL,
   binary = FALSE,
   method = "bray",
   control = NULL,
@@ -46,7 +46,7 @@ gdmm(
 
 \item{link}{Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.}
 
-\item{replace_01}{Numeric vector of length 2 specifying replacement values for dissimilarity values of exactly 0 and 1. Default is c(0,1). ToDo: replace with re-scale}
+\item{scale_diss}{Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values.}
 
 \item{binary}{Logical. Whether to treat response as binary data before calculating dissimilarity from Y. Default is FALSE.}
 
