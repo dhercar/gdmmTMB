@@ -131,6 +131,7 @@ summary.bbgdmm <- function(object,
 #'
 #' @param x An object of class \code{summary.gdmm}.
 #' @method print summary.gdmm
+#' @export
 #' @noRd
 print.summary.gdmm <- function(x) {
   print_title('GDMM SUMMARY', symb = '-')  # call
@@ -166,6 +167,7 @@ print.summary.gdmm <- function(x) {
 #'
 #' @param x An object of class \code{summary.bbgdmm}.
 #' @method print summary.bbgdmm
+#' @export
 #' @noRd
 print.summary.bbgdmm <- function(x) {
   print_title('BBGDMM SUMMARY', symb = '-')  # call

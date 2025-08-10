@@ -59,7 +59,7 @@ diss_gradient <- function(m,
     sdr <- TMB::sdreport(m$obj)
     mean_beta <- sdr$value[names(sdr$value) == 'e_beta']
   } else if (class(m) == 'bbgdmm') {
-    mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, mean)
+    mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, median)
   }
 
   # SIM
@@ -77,15 +77,15 @@ diss_gradient <- function(m,
   }
 
   # prep x data
-  x_mean <- apply(m$X[,all_vars, drop = F], 2, min)
-  x_min <- matrix(rep(x_mean, each = n), nrow = n, ncol =  length(x_mean), byrow = F)
-  colnames(x_min) <- all_vars
+  x_min <- apply(m$X[,all_vars, drop = F], 2, min)
+  x_mean <- matrix(rep(x_min, each = n), nrow = n, ncol =  length(x_min), byrow = F)
+  colnames(x_mean) <- all_vars
 
   # mean f(x)
   out_list <- list()
 
   for (v in var) {
-    x_new <- x_min
+    x_new <- x_mean
     x_new[,v] <- seq(min(m$X[,v]), max(m$X[,v]), length.out = n)
     x_new <- apply(x_new, 2, as.numeric)
     suppressWarnings({

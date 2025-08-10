@@ -301,7 +301,7 @@ gdmm <- function(Y = NULL,
                   opt = opt,
                   boot = FALSE,
                   mono = mono,
-                  mono_p = mono_pair,
+                  mono_pair = mono_pair,
                   call = match.call())
 
       out <- new_gdmm(fit)
