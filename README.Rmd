@@ -16,6 +16,11 @@ devtools::install_github('dhercar/gdmmTMB')
 
 # A brief introduction to `gdmmTMB`
 
+ToDo
+
+# Example
+
+Prep data
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(gdmmTMB)
@@ -31,20 +36,38 @@ env <- gdm::southwest %>% select(-c(species)) %>%
   distinct() %>% arrange(site)
 kableExtra::kable(head(env))
 
-m <- gdmm(Y = sp[,-1],
-          X = env,
-          diss_formula = ~ isp(bio6)  + isp(bio15) + isp(bio19),
-          family = 'binomial',
-          n_boot = 100,
-          bboot = T,
-          mono = T)
-
-summary(m)
-
-f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
 ```
 
 
+Fit model
+
+```{r}
+m <- gdmm(Y = sp[,-1],
+          X = env,
+          diss_formula = ~ 
+            isp(bio6)  +
+            isp(bio15) + 
+            isp(bio19),
+          family = 'binomial',
+          n_boot = 100, # should be at least
+          bboot = T,
+          mono = T)
+```
+
+
+Print summary
+
+```{r}
+summary(m)
+```
+
+
+Obtain dissimilarity gradients
+```{r, message=FALSE}
+f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
+```
+
+Plot dissimilarity gradients
 ```{r}
 library(ggplot2)
 

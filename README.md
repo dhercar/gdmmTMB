@@ -19,6 +19,12 @@ devtools::install_github('dhercar/gdmmTMB')
 
 # A brief introduction to `gdmmTMB`
 
+ToDo
+
+# Example
+
+Prep data
+
 ``` r
 library(tidyverse)
 library(gdmmTMB)
@@ -55,17 +61,24 @@ kableExtra::kable(head(env))
 |  885 | 20.2775 | 411.4175 | 76.60250 | 185.1150 |   967.4150 | 36.04857 | 5.680000 | 54.51429 |     0 | 128.7429 | -29.63957 | 117.1029 |
 |  886 | 14.2750 | 277.9775 | 62.86750 | 119.9950 |   705.0200 | 36.03030 | 5.409091 | 50.30303 |     0 | 118.0606 | -29.69400 | 117.6156 |
 
+Fit model
+
 ``` r
 m <- gdmm(Y = sp[,-1],
           X = env,
-          diss_formula = ~ isp(bio6)  + isp(bio15) + isp(bio19),
+          diss_formula = ~ 
+            isp(bio6)  +
+            isp(bio15) + 
+            isp(bio19),
           family = 'binomial',
-          n_boot = 100,
+          n_boot = 100, # should be at least
           bboot = T,
           mono = T)
 ```
 
     ## Running bayesian bootstrapping on 22 cores ...done
+
+Print summary
 
 ``` r
 summary(m)
@@ -82,16 +95,16 @@ summary(m)
     ## --------------------------------- Coeff. Table --------------------------------- 
     ## 
     ##                    Estimate  Std.Err.      2.5%       50%     97.5% pseudo-Z
-    ## diss: isp(bio6)1  3.224e-01 1.477e-01 3.332e-02 3.155e-01 6.217e-01   2.1833
-    ## diss: isp(bio6)2  1.684e-02 5.173e-02 1.004e-08 1.569e-08 1.733e-01   0.3255
-    ## diss: isp(bio6)3  9.232e-03 2.896e-02 1.000e-08 1.030e-08 1.187e-01   0.3188
-    ## diss: isp(bio15)1 7.871e-01 1.292e-01 5.403e-01 7.820e-01 1.027e+00   6.0927
-    ## diss: isp(bio15)2 1.062e-08 2.949e-09 1.000e-08 1.001e-08 1.359e-08   3.6032
-    ## diss: isp(bio15)3 1.032e-08 2.501e-09 1.000e-08 1.000e-08 1.100e-08   4.1264
-    ## diss: isp(bio19)1 1.933e+00 1.805e-01 1.619e+00 1.917e+00 2.281e+00  10.7096
-    ## diss: isp(bio19)2 1.024e-08 9.344e-10 1.000e-08 1.000e-08 1.251e-08  10.9603
-    ## diss: isp(bio19)3 1.080e-08 6.416e-09 1.000e-08 1.000e-08 1.268e-08   1.6833
-    ## (Intercept)       1.755e-01 6.918e-02 3.928e-02 1.743e-01 3.078e-01   2.5364
+    ## diss: isp(bio6)1  3.146e-01 1.642e-01 4.497e-08 2.945e-01 6.421e-01   1.9159
+    ## diss: isp(bio6)2  1.230e-02 5.524e-02 1.002e-08 1.441e-08 1.406e-01   0.2226
+    ## diss: isp(bio6)3  1.041e-02 3.282e-02 1.000e-08 1.029e-08 1.077e-01   0.3172
+    ## diss: isp(bio15)1 8.296e-01 1.498e-01 6.218e-01 8.206e-01 1.148e+00   5.5399
+    ## diss: isp(bio15)2 5.131e-04 5.131e-03 1.000e-08 1.001e-08 1.145e-08   0.1000
+    ## diss: isp(bio15)3 1.057e-08 5.257e-09 1.000e-08 1.000e-08 1.049e-08   2.0113
+    ## diss: isp(bio19)1 1.921e+00 1.625e-01 1.538e+00 1.933e+00 2.189e+00  11.8181
+    ## diss: isp(bio19)2 1.020e-08 9.398e-10 1.000e-08 1.000e-08 1.079e-08  10.8569
+    ## diss: isp(bio19)3 2.046e-03 2.046e-02 1.000e-08 1.000e-08 1.101e-08   0.1000
+    ## (Intercept)       1.753e-01 6.858e-02 6.354e-02 1.772e-01 2.926e-01   2.5561
     ##                   pseudo-Pval    
     ## diss: isp(bio6)1       < 0.01 ***
     ## diss: isp(bio6)2       < 0.01 ***
@@ -104,18 +117,25 @@ summary(m)
     ## diss: isp(bio19)3      < 0.01 ***
     ## (Intercept)              0.01   *
 
+    ## 
+    ## CAUTION: P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"
+
     ## ---
     ## signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 
     ## ---
     ## 
-    ## Marginal log-likelihood (average):  -42829.04 
-    ## AIC:  85678.08 , AICc:  85678.13 , BIC:  85741.91 
+    ## Marginal log-likelihood (average):  -43198.07 
+    ## AIC:  86416.14 , AICc:  86416.19 , BIC:  86479.97 
     ## 
     ## --------------------------------------------------------------------------------
+
+Obtain dissimilarity gradients
 
 ``` r
 f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
 ```
+
+Plot dissimilarity gradients
 
 ``` r
 library(ggplot2)
@@ -133,4 +153,4 @@ do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
         aspect.ratio = 1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
