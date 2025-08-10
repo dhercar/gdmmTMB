@@ -4,7 +4,8 @@
 #' @param Y_diss Pre-calculated dissimilarity values between site pairs. If provided, D must also be supplied.
 #' @param Y_den Denominator values for Jaccard, Sorensen or Bray-Curtis dissimilarities when using Y_diss. Required when family = "binomial" and Y_diss is provided.
 #' @param D Data frame or matrix with two columns specifying site pairs (indices) corresponding to Y_diss values. Only required when Y_diss is provided.
-#' @param X Data frame containing predictor variables.
+#' @param X Data frame containing predictor variables as site-level values.
+#' @param X_pair Data frame containing predictor variables as pairwise distances.
 #' @param diss_formula Formula specifying predictors for dissimilarity gradients. All variables must be numeric. `isp(c)` can be used in combination with `mono = TRUE` to fit monotonic I-splines (e.g., `~ elevation + temperature`).
 #' @param uniq_formula Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., `~ treatment + (1|site)`).
 #' @param mono Logical. If TRUE, enforces monotonic (non-decreasing) dissimilarity effects. Default is FALSE.
@@ -39,9 +40,12 @@ gdmm <- function(Y = NULL,
                  Y_den = 0,
                  D = NULL,
                  X = NULL,
-                 diss_formula= NULL,
-                 uniq_formula= NULL,
+                 X_pair = NULL,
+                 diss_formula = NULL,
+                 uniq_formula = NULL,
+                 pair_formula = NULL,
                  mono = FALSE,
+                 mono_pair = FALSE,
                  family = 'normal',
                  link = NULL,
                  scale_diss = NULL,
@@ -52,19 +56,10 @@ gdmm <- function(Y = NULL,
                  bboot = FALSE,
                  n_boot = 1000,
                  n_cores = NULL) {
+
   #### Checks ####
-  # either Y or (Y_diss + D) is provided
-  if (is.null(Y) && is.null(Y_diss)) {
-    stop("Either 'Y' or 'Y_diss' must be provided")
-  }
-
-  if (!is.null(Y) && !is.null(Y_diss)) {
-    message("Both 'Y' and 'Y_diss' provided. Ignoring 'Y'")
-  }
-
-  # D present if Y_diss
-  if (!is.null(Y_diss) && is.null(D) && is.null(Y)) {
-    stop("When 'Y_diss' is provided, 'D' must also be provided")
+    if (!is.null(pair_formula) && is.null(X_pair)) {
+    stop("You supplied 'pair_formula' but no 'X_pair'. Please supply a pairwise data.frame/matrix aligned to D/Y_diss, or remove 'pair_formula'.")
   }
 
   # Y_den present if needed
@@ -103,6 +98,16 @@ gdmm <- function(Y = NULL,
     }
   }
 
+  if (!is.null(X_pair) && !is.null(pair_formula)) {
+    vars_form <- all.vars(pair_formula)
+    is_numeric_X_pair <- apply(X_pair[,vars_form, drop = F], 2, is.numeric)
+    if (!all(is_numeric_X_pair)) {
+      stop(paste0("Variables included in 'pair_formula' are not numeric: ", paste(vars_form[!is_numeric_X_pair], collapse = ', ')))
+    }
+  }
+
+  #### Model specs ####
+
   # Match family with link
   if (is.null(link))  {
     link <- switch(family,
@@ -129,16 +134,27 @@ gdmm <- function(Y = NULL,
                      'neg_exp' = 2,
                      'neg_gaus' = 3)
 
-  # Diss. model matrix
-  if (!is.null(diss_formula) & !is.null(X)) {
-  form_X <- hardhat::mold(diss_formula,
-                          X,
+  #### VARS PREP ####
+
+  # 1. Diss. model matrix (pair)
+  if (!is.null(pair_formula) & !is.null(X_pair)) {
+  form_X_pair <- hardhat::mold(pair_formula,
+                          X_pair,
                           blueprint = default_formula_blueprint(intercept = FALSE))
   } else {
-  form_X <- list(predictors =  matrix(ncol = 0, nrow = 0))
+  form_X_pair <- list(predictors =  matrix(ncol = 0, nrow = 0))
   }
 
-  # Uniq. model matrix
+  # 2. Diss. model matrix (site)
+  if (!is.null(diss_formula) & !is.null(X)) {
+    form_X <- hardhat::mold(diss_formula,
+                            X,
+                            blueprint = default_formula_blueprint(intercept = FALSE))
+  } else {
+    form_X <- list(predictors =  matrix(ncol = 0, nrow = 0))
+  }
+
+  # 3. Uniq. model matrix
   if (!is.null(uniq_formula) & !is.null(X)) {
     fix_terms_W <- lme4::nobars(uniq_formula)
     re_vars <- all.vars(uniq_formula)[!(all.vars(uniq_formula) %in% all.vars(fix_terms_W))]
@@ -156,7 +172,7 @@ gdmm <- function(Y = NULL,
     form_W <- list(predictors =  matrix(ncol = 0, nrow = 0))
   }
 
-  # Re model matrix
+  # 4. Re model matrix
   map = list()
   if (length(re_vars) > 0) {
     Z_design <- Matrix::sparse.model.matrix(eval(parse(text = paste0('~ 0 + ', paste0(re_vars, collapse = ' + ')))),
@@ -175,16 +191,17 @@ gdmm <- function(Y = NULL,
     map_re = 0
   }
 
+  # 5. Response
   if (is.null(Y_diss)) {
     if (family %in% c('binomial')) {
-      Y_pair <- make_y_df(com = Y, method = method, binary = binary, num_den = TRUE)
+      Y_pair <- make_y_df(com = Y, D = D, method = method, binary = binary, num_den = TRUE)
       Y_diss <- Y_pair[,3]
       Y_den <- Y_pair[,4]
       D <- Y_pair[,1:2]
       map = list(log_scale = factor(NA))
 
     } else {
-      Y_pair <- make_y_df(com = Y, method = method, binary = binary, num_den = FALSE)
+      Y_pair <- make_y_df(com = Y, D = D, method = method, binary = binary, num_den = FALSE)
       Y_diss <- Y_pair[,3]
       Y_den <- 0
       D <- Y_pair[,1:2]
@@ -195,22 +212,26 @@ gdmm <- function(Y = NULL,
     Y_diss <- scale_dist(Y_diss, scale_diss)
   }
 
+  #### construct model ####
   data <- list(
     Y = Y_diss,
     Y_den = Y_den,
     D = as.matrix(D - 1), # remove 1 to match c++
     X = as.matrix(form_X$predictors),
+    X_pair =  as.matrix(form_X_pair$predictors),
     W = as.matrix(form_W$predictors),
     Z = Z_design,
     has_random = has_re,
     map_re = map_re - 1,  # remove 1 to match c++ indexing
     mono = as.numeric(mono),
+    mono_pair = as.numeric(mono_pair),
     link = link_num,
     family = family_num)
 
   parameters <- list(
     intercept = 0,
     beta = rep(0, ncol(form_X$predictors)),
+    beta_p = rep(0, ncol(form_X_pair$predictors)),
     lambda = rep(0, ncol(form_W$predictors)),
     log_sigma_re = rep(0, length(re_vars)),
     u = rep(0, ncol(Z_design)*has_re),
@@ -227,7 +248,7 @@ gdmm <- function(Y = NULL,
     }
   }
 
-
+  #### NO BAYESIAN BOOTSTRAPPING ####
   if (bboot == FALSE) {
     data[['weights']] <- rep(1, length(Y_diss))
 
@@ -240,6 +261,7 @@ gdmm <- function(Y = NULL,
       silent = !trace
     )
 
+    # not in use (using exp transformation in c++)
     n_par <- length(obj$par)
     lower_bounds <- rep(-Inf, n_par)
     upper_bounds <- rep(Inf, n_par)
@@ -262,25 +284,30 @@ gdmm <- function(Y = NULL,
                   Y_diss = Y_diss,
                   Y_den = Y_den,
                   X = X,
+                  X_pair = X_pair,
                   D = D,
                   form_X = form_X,
                   form_W = form_W,
+                  form_X_pair = form_X_pair,
                   Z_design = Z_design,
                   map_re = map_re,
                   re_vars = re_vars,
                   diss_formula = diss_formula,
                   uniq_formula = uniq_formula,
+                  pair_formula = pair_formula,
                   link = link,
                   family = family,
                   obj = obj,
                   opt = opt,
                   boot = FALSE,
                   mono = mono,
+                  mono_p = mono_pair,
                   call = match.call())
 
       out <- new_gdmm(fit)
       return(out)
 
+  #### BAYESIAN BOOTSTRAPPING ####
   } else if (bboot == TRUE) {
     if (is.null(n_cores))  n_cores = parallel::detectCores(logical = TRUE) - 2
 
@@ -332,20 +359,24 @@ gdmm <- function(Y = NULL,
                 Y_diss = Y_diss,
                 Y_den = Y_den,
                 X = X,
+                X_pair = X_pair,
                 D = D,
                 form_X = form_X,
                 form_W = form_W,
+                form_X_pair = form_X_pair,
                 Z_design = Z_design,
                 map_re = map_re,
                 re_vars = re_vars,
                 diss_formula = diss_formula,
                 uniq_formula = uniq_formula,
+                pair_formula = pair_formula,
                 link = link,
                 family = family,
                 boot_samples = results,
                 n_boot = n_boot,
                 boot = TRUE,
                 mono = mono,
+                mono_pair = mono_pair,
                 call = match.call())
     out <- new_bbgdmm(fit)
     return(out)

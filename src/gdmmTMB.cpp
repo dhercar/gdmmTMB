@@ -7,27 +7,31 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(Y_den);
   DATA_MATRIX(D);                          // mapping of sample pairs
   DATA_MATRIX(X);                          // pair-level variables (diss. gradients)
+  DATA_MATRIX(X_pair);                     // pair-level varialbles (as distances)
   DATA_MATRIX(W);                          // sample-level variables (effects on uniqueness)
-  DATA_VECTOR(weights)
+  DATA_VECTOR(weights);
 
   DATA_SPARSE_MATRIX(Z);                   // Random effects design
   DATA_INTEGER(has_random);                // Flag for re
   DATA_INTEGER(mono);                      // Flag (monotonic diss. effects)
+  DATA_INTEGER(mono_pair);                      // Flag (monotonic diss. effects) (X_pair)
   DATA_INTEGER(link);                      // link
   DATA_INTEGER(family);                    // family
   DATA_IVECTOR(map_re);                    // Mapping RE columns
 
   // Parameters
-  PARAMETER(intercept);                   // Intercept
-  PARAMETER_VECTOR(beta);                 // Slopes diss. grad
-  PARAMETER_VECTOR(lambda);               // Slopes uniq.
-  PARAMETER_VECTOR(u);                    // random effects
-  PARAMETER_VECTOR(log_sigma_re);         // sigma of random effects
-  PARAMETER(log_scale);                   // scale parameter
+  PARAMETER(intercept);                    // Intercept
+  PARAMETER_VECTOR(beta);                  // Slopes diss. grad (X)
+  PARAMETER_VECTOR(beta_p);                // Slopes diss. grad (X_pair)
+  PARAMETER_VECTOR(lambda);                // Slopes uniq.(W)
+  PARAMETER_VECTOR(u);                     // random effects
+  PARAMETER_VECTOR(log_sigma_re);          // sigma of random effects
+  PARAMETER(log_scale);                    // scale parameter
 
   // Derived quantities
   int n_pairs = Y.size();
   int n_X = X.cols();
+  int n_Xp = X_pair.cols();
   int n_W = W.cols();
 
   vector<Type> e_beta = beta;
@@ -36,12 +40,20 @@ Type objective_function<Type>::operator() ()
     e_beta = exp(e_beta) + Type(1e-8);
   }
 
+  vector<Type> e_beta_p = beta_p;
+  // Exp beta
+  if (mono_pair) {
+    e_beta_p = exp(e_beta_p) + Type(1e-8);
+  }
+
   // Contributions
-  vector<Type> pair_comp_contrib(n_pairs);
+  vector<Type> diss_comp_contrib(n_pairs);
+  vector<Type> diss_p_comp_contrib(n_pairs);
   vector<Type> site_comp_contrib(n_pairs);
   vector<Type> re_comp(n_pairs);
 
-  pair_comp_contrib.setZero();
+  diss_comp_contrib.setZero();
+  diss_p_comp_contrib.setZero();
   site_comp_contrib.setZero();
   re_comp.setZero();
 
@@ -69,13 +81,17 @@ Type objective_function<Type>::operator() ()
 
   // fixed effects contribution
   if (n_X > 0) {
-    matrix<Type> pair_comp(n_pairs, n_X);
+    matrix<Type> diss_comp(n_pairs, n_X);
     for (int i = 0; i < n_pairs; i++) {
       int s1 = CppAD::Integer(D(i, 0));
       int s2 = CppAD::Integer(D(i, 1));
-      pair_comp.row(i) = (X.row(s1) - X.row(s2)).array().abs();
+      diss_comp.row(i) = (X.row(s1) - X.row(s2)).array().abs();
     }
-    pair_comp_contrib = pair_comp * e_beta;
+    diss_comp_contrib = diss_comp * e_beta;
+  }
+
+  if (n_Xp > 0) {
+    diss_p_comp_contrib = X_pair * e_beta_p;
   }
 
   if (n_W > 0) {
@@ -89,7 +105,7 @@ Type objective_function<Type>::operator() ()
   }
 
   // linear predictor
-  vector<Type> eta = intercept + pair_comp_contrib + site_comp_contrib + re_comp;
+  vector<Type> eta = intercept + diss_comp_contrib + diss_p_comp_contrib + site_comp_contrib + re_comp;
 
 
   // Expected dissimilarity
@@ -138,11 +154,13 @@ Type objective_function<Type>::operator() ()
   }
 
   ADREPORT(e_beta);
+  ADREPORT(e_beta_p);
   ADREPORT(lambda);
   ADREPORT(intercept);
 
   REPORT(u);
   REPORT(e_beta);
+  REPORT(e_beta_p);
   REPORT(lambda);
   REPORT(intercept);
   REPORT(sigma_re);

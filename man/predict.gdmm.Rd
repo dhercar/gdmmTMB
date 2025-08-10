@@ -8,7 +8,9 @@
   obj,
   new_X = NULL,
   new_W = NULL,
+  new_X_pair = NULL,
   new_re = NULL,
+  new_D = NULL,
   re_sd = logical(0),
   component = "dissimilarity",
   scale_uniq = TRUE,
@@ -27,7 +29,11 @@ If NULL (default), uses the original data from the fitted model.}
 
 \item{new_W}{A data frame or matrix of new predictor variables for the uniqueness component.}
 
+\item{new_X_pair}{A data frame or matrix of new pairwise predictor variables for the dissimilarity component, usually distances.}
+
 \item{new_re}{A data frame of new random effect variables. If NULL, uses the random effect}
+
+\item{new_D}{Matrix of pairwise combination indices. Required when new_X_pair is provided.}
 
 \item{re_sd}{A character indicating which random effects should be treated as having
 standard deviation (used for simulation).}
