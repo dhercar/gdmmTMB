@@ -79,7 +79,7 @@ predict.gdmm <- function(obj,
     message("'new_W' not provided: using new_W = new_X")
   }
 
-  n <- max(nrow(new_X), nrow(new_W), nrow(new_re), nrow(new_D))
+  n <- max(nrow(new_X), nrow(new_W), nrow(new_re))
 
   # sample combinations
   if (is.null(new_D)) {
@@ -94,7 +94,7 @@ predict.gdmm <- function(obj,
 
     D <- as.matrix(new_D)
 
-    if (all(new_D %in% 1:nrow(X_new))) {
+    if (all(new_D %in% 1:nrow(new_X))) {
       stop("'new_D' should only contain integers between 1 and nrow(X_new)")
     }
   }
