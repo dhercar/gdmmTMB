@@ -34,9 +34,11 @@ summary.gdmm <- function(object, ...) {
 
     out <- list(call = object$call,
                 mono = object$mono,
+                mono_pair = object$mono_pair,
                 table = coef_table,
                 p_values = p_values,
                 names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
+                names_beta_p = paste0('diss(p): ', colnames(object$form_X_pair$predictors)),
                 names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
                 sig = sig_stars,
                 AIC = m_AIC$AIC,
@@ -102,6 +104,7 @@ summary.bbgdmm <- function(object,
 
   out <- list(call = object$call,
               mono = object$mono,
+              mono_pair = object$mono_pair,
               estimate = means,
               sds = sds,
               pseudo_zval = pseudo_z,
@@ -113,6 +116,7 @@ summary.bbgdmm <- function(object,
               AICc = m_AIC$AICc,
               BIC = m_BIC,
               names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
+              names_beta_p = paste0('diss(p): ', colnames(object$form_X_pair$predictors)),
               names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
               sig = sig_stars,
               logL = logL)
@@ -127,6 +131,7 @@ summary.bbgdmm <- function(object,
 #'
 #' @param x An object of class \code{summary.gdmm}.
 #' @method print summary.gdmm
+#' @export
 #' @noRd
 print.summary.gdmm <- function(x) {
   print_title('GDMM SUMMARY', symb = '-')  # call
@@ -137,6 +142,7 @@ print.summary.gdmm <- function(x) {
   # table
   cat("coeff. summary table:\n\n")
   rownames(x$table)[rownames(x$table) == 'e_beta'] <- x$names_beta
+  rownames(x$table)[rownames(x$table) == 'e_beta_p'] <- x$names_beta_p
   rownames(x$table)[rownames(x$table) == 'lambda'] <- x$names_lambda
   rownames(x$table)[rownames(x$table) == 'intercept'] <- '(Intercept)'
   x$table <- data.frame(x$table, x$sig)
@@ -144,6 +150,7 @@ print.summary.gdmm <- function(x) {
   print(x$table, digits = 3)
 
   if (x$mono) message('\nCAUTION: P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"')
+  if (x$mono_pair) message('\nCAUTION: P-values for dissimilarity components (diss(p)) should not be used for hypothesis testing when "mono_pair = TRUE"')
 
   cat("---\n")
   cat("signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 \n")
@@ -160,6 +167,7 @@ print.summary.gdmm <- function(x) {
 #'
 #' @param x An object of class \code{summary.bbgdmm}.
 #' @method print summary.bbgdmm
+#' @export
 #' @noRd
 print.summary.bbgdmm <- function(x) {
   print_title('BBGDMM SUMMARY', symb = '-')  # call
@@ -170,6 +178,7 @@ print.summary.bbgdmm <- function(x) {
   # table
   print_title2(" Coeff. Table ", symb = '-')
   rownames(x$CI)[rownames(x$CI) == 'e_beta'] <- x$names_beta
+  rownames(x$CI)[rownames(x$CI) == 'e_beta_p'] <- x$names_beta_p
   rownames(x$CI)[rownames(x$CI)  == 'lambda'] <- x$names_lambda
   rownames(x$CI)[rownames(x$CI)  == 'intercept'] <- '(Intercept)'
   colnames(x$CI) <-  paste0(x$quantiles*100, '%')
@@ -183,7 +192,8 @@ print.summary.bbgdmm <- function(x) {
   names(table) <- c('Estimate', 'Std.Err.', paste0(x$quantiles*100,'%'), 'pseudo-Z', 'pseudo-Pval', ' ')
   print(table, digits = 4)
 
-  if (x$mono) message('\nCAUTION: pseudo P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"')
+  if (x$mono) message('\nCAUTION: P-values for dissimilarity components (diss) should not be used for hypothesis testing when "mono = TRUE"')
+  if (x$mono_pair) message('\nCAUTION: P-values for dissimilarity components (diss(p)) should not be used for hypothesis testing when "mono_pair = TRUE"')
 
   cat("---\n")
   cat("signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 \n")

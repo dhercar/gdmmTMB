@@ -3,7 +3,8 @@
 #' Formats species x site table into a long data frame of community dissimilarities
 #'
 #' @param com community matrix (sites x species)
-#' @param id Optional: Unique name for each location
+#' @param D Optional. Numeric matrix with two columns
+#' @param id Optional. Unique id for each sample
 #' @param method Method used to calculate community dissimilarity between pairs of sites. Either a distance metric supported by vegan, 'abcd' to obtain each component of the binary contingecy matrix, 'decomp1' or 'decomp2' for Pierre Legendre's or Andres Baselga's turnover and nestedness decomposition
 #' @param num_den For some dissimilarity indices, whether function should return the numerator and denominator in two different columns
 #' @param trans Transformation to be applied to raw data before calculating distance matrix. Either a function or 'binary' to transform to presence-absence)
@@ -38,6 +39,7 @@
 #'
 make_y_df <-
   function(com = NULL,
+           D = NULL,
            id = NULL,
            method = 'bray',
            num_den = FALSE,
@@ -158,8 +160,46 @@ make_y_df <-
 
     # ---- Calculate distance matrix ----
 
-    row_col <- expand.grid(s1 = 1:nrow(com), s2 = 1:nrow(com))
-    row_col <- row_col[row_col$s1 > row_col$s2,]
+    if (!is.null(id)) {
+      if (anyDuplicated(id)) {
+        stop("The 'id' variable must contain unique values for each site (no duplicates).")
+      }
+    }
+
+    # handle D if provided
+    if (is.null(D)) {
+      # Generate all pairs by numeric index
+      D <- t(combn(1:nrow(com), 2))
+      colnames(D) <- c('s1', 's2')
+    } else {
+      if (!is.matrix(D) && !is.data.frame(D)) {
+        stop("'D' must be a matrix or data frame with two columns")
+      }
+      if (ncol(D) != 2) {
+        stop("'D' must have exactly two columns")
+      }
+
+      D <- as.matrix(D)
+
+      if (is.character(D[,1]) || is.character(D[,2])) {
+        # Require id to be provided for name matching
+        if (is.null(id)) {
+          stop("When 'D' contains site names, 'id' must be provided to map site names to indices")
+        }
+
+        # all D values are in id
+        if (!all(D[,1] %in% id) || !all(D[,2] %in% id)) {
+          stop("Some site names in 'D' are not found in 'id'")
+        }
+
+        idx1 <- match(D[,1], id)
+        idx2 <- match(D[,2], id)
+
+        D <- cbind(idx1, idx2)
+        colnames(D) <- c('s1', 's2')
+      }
+    }
+
 
     # This could be parallelised in the future´
     if (num_den) {
@@ -170,11 +210,11 @@ make_y_df <-
                           as.matrix(vegan::designdist(com,method = x,abcd = TRUE))
                         })
 
-        a = betas[[1]][cbind(row_col$s1, row_col$s2)]
-        b = betas[[2]][cbind(row_col$s1, row_col$s2)]
-        c = betas[[3]][cbind(row_col$s1, row_col$s2)]
+        a = betas[[1]][cbind(D[,1], D[,2])]
+        b = betas[[2]][cbind(D[,1], D[,2])]
+        c = betas[[3]][cbind(D[,1], D[,2])]
 
-        dist.data <- data.frame(row_col,
+        dist.data <- data.frame(D,
                                 num_sor = (b + c),
                                 den_sor = (2*a + b + c))
 
@@ -185,24 +225,24 @@ make_y_df <-
                           as.matrix(vegan::designdist(com,method = x,abcd = TRUE))
                         })
 
-        a = betas[[1]][cbind(row_col$s1, row_col$s2)]
-        b = betas[[2]][cbind(row_col$s1, row_col$s2)]
-        c = betas[[3]][cbind(row_col$s1, row_col$s2)]
+        a = betas[[1]][cbind(D[,1], D[,2])]
+        b = betas[[2]][cbind(D[,1], D[,2])]
+        c = betas[[3]][cbind(D[,1], D[,2])]
 
-        dist.data <- data.frame(row_col,
+        dist.data <- data.frame(D,
                                 num_jac = (b + c),
                                 den_jac = (a + b + c))
 
       } else if (method == 'bray') {
 
-        bray1 <- data.frame(t(apply(row_col,
+        bray1 <- data.frame(t(apply(D,
                                     MARGIN = 1,
                                     function(x){
                                       bray1(com[x[1],], com[x[2],])
                                     })))
 
         names(bray1) <- c('num_bra','den_bra')
-        dist.data <- data.frame(row_col,bray1)
+        dist.data <- data.frame(D,bray1)
 
       }else{
         stop(paste0("'num_den' not supported for method '", method, "'! 'num_den' only supported for methods \"bray\", \"sorensen\" and \"jaccard\". Method provided: ", method))
@@ -216,25 +256,25 @@ make_y_df <-
 
         # Create data frame
         dist.data <- data.frame(
-          row_col,
-          a = betas[[1]][cbind(row_col$s1, row_col$s2)],
-          b = betas[[2]][cbind(row_col$s1, row_col$s2)],
-          c = betas[[3]][cbind(row_col$s1, row_col$s2)],
-          d = betas[[4]][cbind(row_col$s1, row_col$s2)]
+          D,
+          a = betas[[1]][cbind(D[,1], D[,2])],
+          b = betas[[2]][cbind(D[,1], D[,2])],
+          c = betas[[3]][cbind(D[,1], D[,2])],
+          d = betas[[4]][cbind(D[,1], D[,2])]
         )
       } else if (method %in% c('decomp1', 'decomp2')) {
         betas <- lapply(c('a', 'b', 'c'), function(x) {
           as.matrix(vegan::designdist(com, method = x, abcd = TRUE))
         })
 
-        a = betas[[1]][cbind(row_col$s1, row_col$s2)]
-        b = betas[[2]][cbind(row_col$s1, row_col$s2)]
-        c = betas[[3]][cbind(row_col$s1, row_col$s2)]
+        a = betas[[1]][cbind(D[,1], D[,2])]
+        b = betas[[2]][cbind(D[,1], D[,2])]
+        c = betas[[3]][cbind(D[,1], D[,2])]
 
         if (method == 'decomp1') {
           #Legendre's apprach
           dist.data <- data.frame(
-            row_col,
+            D,
             sim = 2 * pmin(b, c) / (2 * a + b + c),
             sne = abs(b - c) / (2 * a + b + c),
             sor = (b + c) / (2 * a + b + c)
@@ -243,7 +283,7 @@ make_y_df <-
         } else if (method == 'decomp2') {
           #Baselga's approach
           dist.data <- data.frame(
-            row_col,
+            D,
             sim = pmin(b, c) / (a + pmin(b + c)),
             sor = (b + c) / (2 * a + b + c)
           )
@@ -261,15 +301,8 @@ make_y_df <-
           stop("Unable to calculate community dissimilarity matrix! 'method' should be one of:\n- A method compatible with vegan `vegdist`\n- \"decomp1\" or \"decomp2\" for Sorensen-based decomposition of beta-diversity into species replacement and richness differences\n- \"abcd\" for individual elements of the binary contingency table")
         })
 
-        dist.data <- data.frame(row_col, diss = betas[cbind(row_col$s1, row_col$s2)])
+        dist.data <- data.frame(D, diss = betas[cbind(D[,1], D[,2])])
       }
     }
-
-    if (!is.null(id)) {
-      dist.data$s1 = id[dist.data$s1]
-      dist.data$s2 = id[dist.data$s2]
-      row.names(com) <- id
-    }
-
     return(dist.data)
   }

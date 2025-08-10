@@ -6,6 +6,7 @@
 \usage{
 make_y_df(
   com = NULL,
+  D = NULL,
   id = NULL,
   method = "bray",
   num_den = FALSE,
@@ -21,7 +22,9 @@ make_y_df(
 \arguments{
 \item{com}{community matrix (sites x species)}
 
-\item{id}{Optional: Unique name for each location}
+\item{D}{Optional. Numeric matrix with two columns}
+
+\item{id}{Optional. Unique id for each sample}
 
 \item{method}{Method used to calculate community dissimilarity between pairs of sites. Either a distance metric supported by vegan, 'abcd' to obtain each component of the binary contingecy matrix, 'decomp1' or 'decomp2' for Pierre Legendre's or Andres Baselga's turnover and nestedness decomposition}
 

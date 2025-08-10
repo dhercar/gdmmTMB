@@ -8,10 +8,12 @@ coef_to_pred(
   obj,
   intercept,
   beta,
+  beta_p,
   lambda,
   u,
   new_W,
   new_X,
+  new_X_pair,
   new_re,
   D,
   n,
@@ -28,6 +30,8 @@ coef_to_pred(
 
 \item{beta}{Numeric vector, coefficients for dissimilarity component}
 
+\item{beta_p}{Numeric vector, coefficients for dissimilarity component (pairwise)}
+
 \item{lambda}{Numeric vector, coefficients for uniqueness component}
 
 \item{u}{Numeric vector, random effect values}
@@ -35,6 +39,8 @@ coef_to_pred(
 \item{new_W}{Matrix/data.frame, new data for uniqueness component}
 
 \item{new_X}{Matrix/data.frame, new data for dissimilarity component}
+
+\item{new_X_pair}{Matrix/data.frame, new data for dissimilarity component (pairwise)}
 
 \item{new_re}{Matrix/data.frame, new random effect data}
 

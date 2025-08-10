@@ -10,9 +10,12 @@ gdmm(
   Y_den = 0,
   D = NULL,
   X = NULL,
+  X_pair = NULL,
   diss_formula = NULL,
   uniq_formula = NULL,
+  pair_formula = NULL,
   mono = FALSE,
+  mono_pair = FALSE,
   family = "normal",
   link = NULL,
   scale_diss = NULL,
@@ -34,7 +37,9 @@ gdmm(
 
 \item{D}{Data frame or matrix with two columns specifying site pairs (indices) corresponding to Y_diss values. Only required when Y_diss is provided.}
 
-\item{X}{Data frame containing predictor variables.}
+\item{X}{Data frame containing predictor variables as site-level values.}
+
+\item{X_pair}{Data frame containing predictor variables as pairwise distances.}
 
 \item{diss_formula}{Formula specifying predictors for dissimilarity gradients. All variables must be numeric. \code{isp(c)} can be used in combination with \code{mono = TRUE} to fit monotonic I-splines (e.g., \code{~ elevation + temperature}).}
 
