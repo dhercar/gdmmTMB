@@ -10,8 +10,54 @@ output: github_document
 The package `gdmmTMB` provides functions for fitting and interrogating Generalised Dissimilarity Mixed Models (GDMM) using maximum likelihood estimation, Laplace approximation and (optinally) Bayesian Bootstrapping.
 
 # Installation
-```{r, eval = F}
+```{r, eval = FALSE}
 devtools::install_github('dhercar/gdmmTMB')
 ```
 
+# A brief introduction to `gdmmTMB`
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gdmmTMB)
+
+sp <- gdm::southwest %>% select(site, species) %>% 
+  group_by(site, species) %>%
+  summarise(n = 1) %>%
+  pivot_wider(id_cols = site, names_from = species,values_from = n, values_fill = 0 ) %>%
+  arrange(site)
+kableExtra::kable(head(sp))
+
+env <- gdm::southwest %>% select(-c(species)) %>%
+  distinct() %>% arrange(site)
+kableExtra::kable(head(env))
+
+m <- gdmm(Y = sp[,-1],
+          X = env,
+          diss_formula = ~ isp(bio6)  + isp(bio15) + isp(bio19),
+          family = 'binomial',
+          n_boot = 100,
+          bboot = T,
+          mono = T)
+
+summary(m)
+
+f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
+```
+
+
+```{r}
+library(ggplot2)
+
+do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
+  theme_bw() +
+  geom_line(aes(x = x, y = f_x)) +
+  geom_ribbon(aes(x = x, ymax = `CI 2.5%`, ymin = `CI 97.5%`), alpha = 0.1) +
+  geom_ribbon(aes(x = x, ymax = `CI 25%`, ymin = `CI 75%`), alpha = 0.3) +
+  facet_wrap(~var, scales = 'free_x', strip.position = "bottom") +
+  ylab('f(x)') +
+  theme(legend.position = '',
+        strip.placement = 'outside', 
+        strip.background = element_blank(),
+        aspect.ratio = 1)
+```
 
