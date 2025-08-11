@@ -109,7 +109,7 @@ predict.gdmm <- function(obj,
     u <- obj$obj$report()$u
     sigma <- obj$obj$report()$sigma_re[obj$re_vars %in% re_sd]
   } else if (inherits(obj, 'bbgdmm')) {
-    mean_par <- colMeans(obj$boot_samples[,colnames(obj$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
+    mean_par <- colMeans(obj$boot_samples[,colnames(obj$boot_samples) %in% c('intercept', 'e_beta', 'e_beta_p', 'lambda', 'u', 'sigma_re')])
     beta <- mean_par[names(mean_par) == 'e_beta']
     beta_p <-mean_par[names(mean_par) == 'e_beta_p']
     lambda <- mean_par[names(mean_par) == 'lambda']
@@ -257,8 +257,21 @@ predict.bbgdmm <- predict.gdmm
 #' @return Numeric vector of predictions (dissimilarities or uniqueness values)
 #'
 #' @keywords internal
-coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
-                         new_W, new_X, new_X_pair, new_re, D, n, component, scale_uniq, type, sigma) {
+coef_to_pred <- function(obj,
+                         intercept,
+                         beta,
+                         beta_p,
+                         lambda, u,
+                         new_W,
+                         new_X,
+                         new_X_pair,
+                         new_re,
+                         D,
+                         n,
+                         component,
+                         scale_uniq,
+                         type,
+                         sigma) {
 
   if ((length(lambda) > 0) & !is.null(new_W)) {
     form_W_new <- as.matrix(hardhat::forge(new_W, obj$form_W$blueprint)$predictors)
@@ -281,7 +294,7 @@ coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
     form_X_p_new <- as.matrix(hardhat::forge(new_X_pair, obj$form_X_pair$blueprint)$predictors)
     diss_p_comp = form_X_p_new %*% beta_p
   } else {
-    diss_p_comp = 0
+    diss_p_comp <- 0
   }
 
 
