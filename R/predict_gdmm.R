@@ -109,7 +109,7 @@ predict.gdmm <- function(obj,
     u <- obj$obj$report()$u
     sigma <- obj$obj$report()$sigma_re[obj$re_vars %in% re_sd]
   } else if (inherits(obj, 'bbgdmm')) {
-    mean_par <- colMeans(obj$boot_samples[,colnames(obj$boot_samples) %in% c('intercept', 'e_beta', 'e_beta_p', 'lambda', 'u', 'sigma_re')])
+    mean_par <- colMeans(obj$boot_samples[,colnames(obj$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
     beta <- mean_par[names(mean_par) == 'e_beta']
     beta_p <-mean_par[names(mean_par) == 'e_beta_p']
     lambda <- mean_par[names(mean_par) == 'lambda']
@@ -127,7 +127,7 @@ predict.gdmm <- function(obj,
     lambda = lambda,
     sigma = logical(0),
     u = u,
-    D = new_D,
+    D = D,
     n = n,
     new_re = new_re,
     new_X = new_X,
@@ -146,7 +146,8 @@ predict.gdmm <- function(obj,
 
     } else if (inherits(obj, 'gdmm'))  {
       if (is.null(n_sim)) n_sim = 1000
-      sims <- MASS::mvrnorm(n_sim, obj$sdrep$value, obj$sdrep$cov)
+      sdr <- TMB::sdreport(obj$obj)
+      sims <- MASS::mvrnorm(n_sim, sdr$value,  sdr$cov)
     }
 
     pred_list <- list()
@@ -168,13 +169,12 @@ predict.gdmm <- function(obj,
                                 new_re = new_re,
                                 new_X = new_X,
                                 new_X_pair = new_X_pair,
-                                D = new_D,
+                                D = D,
                                 new_W = new_W,
                                 type = type,
                                 scale_uniq = scale_uniq,
                                 component = component)
     }
-
     quantiles <- sort(c((1-CI_quant)*0.5, CI_quant + (1-CI_quant)*0.5))
     CI <- t(apply(do.call(cbind, pred_list), 1, function(x) stats::quantile(x, quantiles)))
     out <- cbind(mean = out, CI = CI)
@@ -257,21 +257,8 @@ predict.bbgdmm <- predict.gdmm
 #' @return Numeric vector of predictions (dissimilarities or uniqueness values)
 #'
 #' @keywords internal
-coef_to_pred <- function(obj,
-                         intercept,
-                         beta,
-                         beta_p,
-                         lambda, u,
-                         new_W,
-                         new_X,
-                         new_X_pair,
-                         new_re,
-                         D,
-                         n,
-                         component,
-                         scale_uniq,
-                         type,
-                         sigma) {
+coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
+                         new_W, new_X, new_X_pair, new_re, D, n, component, scale_uniq, type, sigma) {
 
   if ((length(lambda) > 0) & !is.null(new_W)) {
     form_W_new <- as.matrix(hardhat::forge(new_W, obj$form_W$blueprint)$predictors)
@@ -285,7 +272,7 @@ coef_to_pred <- function(obj,
 
   if ((length(beta) > 0) & !is.null(new_X)) {
     form_X_new <- as.matrix(hardhat::forge(new_X, obj$form_X$blueprint)$predictors)
-    diss_comp = abs(form_X_new[D[,1],, drop = F] - form_X_new[D[,2],,drop = F]) %*% beta
+    diss_comp = abs(form_X_new[D[,1],, drop = F] - form_X_new[D[,2],,drop = F]) %*% c(beta)
   } else {
     diss_comp = 0
   }
@@ -294,7 +281,7 @@ coef_to_pred <- function(obj,
     form_X_p_new <- as.matrix(hardhat::forge(new_X_pair, obj$form_X_pair$blueprint)$predictors)
     diss_p_comp = form_X_p_new %*% beta_p
   } else {
-    diss_p_comp <- 0
+    diss_p_comp = 0
   }
 
 
