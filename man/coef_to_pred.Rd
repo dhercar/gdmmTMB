@@ -5,7 +5,7 @@
 \title{Convert model coefficients to predictions}
 \usage{
 coef_to_pred(
-  obj,
+  object,
   intercept,
   beta,
   beta_p,
@@ -24,7 +24,7 @@ coef_to_pred(
 )
 }
 \arguments{
-\item{obj}{Model object containing fitted model components}
+\item{object}{Model object containing fitted model components}
 
 \item{intercept}{Numeric, model intercept}
 

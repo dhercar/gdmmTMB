@@ -23,20 +23,6 @@
 #'
 #' @importFrom vegan vegdist designdist
 #'
-#' @examples
-#'
-#' n_sites <- 10
-#' n_sp <- 10
-#' data <- matrix(rpois(n_sites*n_sp, 10), ncol = n_sp)
-#'
-#' ID <- paste0('sample_', 1:nrow(data))
-#'
-#' com <- make_y_df(com = data,
-#'             id = ID,
-#'             trans = log1p)
-#'
-#' head(com)
-#'
 #'@keywords internal
 
 make_y_df <-

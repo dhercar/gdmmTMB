@@ -6,7 +6,7 @@
 \title{Predict method for gdmm and bbgdmm objects}
 \usage{
 \method{predict}{gdmm}(
-  obj,
+  object,
   new_X = NULL,
   new_W = NULL,
   new_X_pair = NULL,
@@ -19,11 +19,12 @@
   CI = TRUE,
   CI_quant = c(0.95, 0.5),
   n_sim = NULL,
-  n_cores = 1
+  n_cores = 1,
+  ...
 )
 
 \method{predict}{bbgdmm}(
-  obj,
+  object,
   new_X = NULL,
   new_W = NULL,
   new_X_pair = NULL,
@@ -36,11 +37,12 @@
   CI = TRUE,
   CI_quant = c(0.95, 0.5),
   n_sim = NULL,
-  n_cores = 1
+  n_cores = 1,
+  ...
 )
 }
 \arguments{
-\item{obj}{A fitted model object of class 'gdmm' or 'bbgdmm'}
+\item{object}{A fitted model object of class 'gdmm' or 'bbgdmm'}
 
 \item{new_X}{A data frame or matrix of new predictor variables for the dissimilarity component.
 If NULL (default), uses the original data from the fitted model.}
@@ -74,6 +76,8 @@ If NULL, uses 1000 for 'gdmm' objects and the number of bootstrap samples for 'b
 
 \item{n_cores}{Integer specifying the number of cores to use for parallel computation.
 Currently not implemented. Default is 1.}
+
+\item{...}{Additional parameters (not used).}
 }
 \value{
 If \code{CI = FALSE}, returns a numeric vector of predictions.

@@ -22,13 +22,6 @@ double-centering. Optionally returns LCBD values (relative contributions to tota
 The function double-centers the dissimilarity matrix \code{x} and extracts the diagonal elements. If \code{LCBD = TRUE}, the diagonal is
 normalized to sum to 1.
 }
-\examples{
-
-d <- as.matrix(dist(matrix(rnorm(20), nrow = 5)))
-SS_calc(d)         # raw per-site SS
-SS_calc(d, TRUE)   # LCBD-like values
-
-}
 \seealso{
 \code{\link[adespatial]{LCBD.comp}}
 }

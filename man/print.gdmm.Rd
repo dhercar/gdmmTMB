@@ -4,10 +4,12 @@
 \alias{print.gdmm}
 \title{Print method for gdmm objects}
 \usage{
-\method{print}{gdmm}(m)
+\method{print}{gdmm}(x, ...)
 }
 \arguments{
-\item{m}{A fitted model object of class \code{gdmm}}
+\item{x}{A fitted model object of class \code{gdmm}}
+
+\item{...}{Additional parameters (not used)}
 }
 \description{
 Prints basic information from a fitted gdmm object

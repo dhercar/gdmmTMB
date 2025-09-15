@@ -4,10 +4,12 @@
 \alias{print.bbgdmm}
 \title{Print method for bbgdmm objects}
 \usage{
-\method{print}{bbgdmm}(m)
+\method{print}{bbgdmm}(x, ...)
 }
 \arguments{
-\item{m}{A fitted model object of class \code{bbgdmm}}
+\item{x}{A fitted model object of class \code{bbgdmm}}
+
+\item{...}{Additional parameters (not used)}
 }
 \description{
 Prints basic information from a fitted bbgdmm object

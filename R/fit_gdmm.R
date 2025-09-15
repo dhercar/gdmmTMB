@@ -8,6 +8,7 @@
 #' @param X_pair Data frame containing predictor variables as pairwise distances.
 #' @param diss_formula Formula specifying predictors for dissimilarity gradients. All variables must be numeric. `isp()` can be used in combination with `mono = TRUE` to fit monotonic I-splines (e.g., `~ isp(elevation) + isp(temperature)`).
 #' @param uniq_formula Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., `~ treatment + (1|site)`).
+#' @param pair_formula Formula specifying predictors for dissimilarity gradients. Variables must be numeric.
 #' @param mono Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `diss_formula`. Default is `FALSE`.
 #' @param mono_pair Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `pair_formula`. Default is `FALSE`.
 #' @param family Distribution family for the response. One of `"normal"`, `"binomial"`, or `"beta"`. Default is `"normal"`.
@@ -400,49 +401,49 @@ gdmm <- function(Y = NULL,
 
 
 #' Print method for gdmm objects
-#'
 #' @description
 #' Prints basic information from a fitted gdmm object
 #'
-#' @param m A fitted model object of class \code{gdmm}
+#' @param x A fitted model object of class \code{gdmm}
+#' @param ... Additional parameters (not used)
 #' @seealso \code{\link{print.bbgdmm}} \code{\link{gdmm}}
 #'
 #' @method print gdmm
 
-print.gdmm <- function(m){
+print.gdmm <- function(x, ...){
   print_title('Generalized dissimilarity mixed model (GDMM)', symb = '-')  # call
 
-  cat('convergence:', ifelse(m$opt$convergence == 0, 'succesful convergence\n', 'optimization has not reached succesful convergence\n'))
+  cat('convergence:', ifelse(x$opt$convergence == 0, 'succesful convergence\n', 'optimization has not reached succesful convergence\n'))
   cat('nlminb message: ')
-  cat(m$opt$message, '\n\n')
+  cat(x$opt$message, '\n\n')
 
   cat('function call:\n')
-  print(m$call)
+  print(x$call)
   cat('\n')
 
   print_title2(' Details ', symb = '-')
-  if (m$mono) cat('- monotonic dissimilarity effects (mono = TRUE) \n')
-  cat('- distribution (family):', m$family, '\n')
-  cat('- link:', m$link, '\n\n')
+  if (x$mono) cat('- monotonic dissimilarity effects (mono = TRUE) \n')
+  cat('- distribution (family):', x$family, '\n')
+  cat('- link:', x$link, '\n\n')
 
   print_title2(' Predictors ', symb = '-')
 
   cat('- dissimilarity gradient(s): ')
-  if (!is.null(m$diss_formula)) {
-    print(m$diss_formula)
+  if (!is.null(x$diss_formula)) {
+    print(x$diss_formula)
   } else {
     cat('no dissimilarity gradients included \n')
   }
 
   cat('- effect(s) on uniqueness: ')
-  if (!is.null(m$uniq_formula)) {
-    print(lme4::nobars(m$uniq_formula))
+  if (!is.null(x$uniq_formula)) {
+    print(lme4::nobars(x$uniq_formula))
   } else {
     cat('no predictors on uniqueness included \n')
   }
 
   cat('- random effects: ')
-  cat(ifelse(length(m$re_vars) > 0, paste(m$re_vars,sep = ' ,'), 'no random effects included \n'))
+  cat(ifelse(length(x$re_vars) > 0, paste(x$re_vars,sep = ' ,'), 'no random effects included \n'))
 
 }
 
@@ -452,43 +453,44 @@ print.gdmm <- function(m){
 #' @description
 #' Prints basic information from a fitted bbgdmm object
 #'
-#' @param m A fitted model object of class \code{bbgdmm}
+#' @param x A fitted model object of class \code{bbgdmm}
+#' @param ... Additional parameters (not used)
 #' @seealso \code{\link{print.gdmm}} \code{\link{gdmm}}
 #'
 #' @method print bbgdmm
 
-print.bbgdmm <- function(m){
+print.bbgdmm <- function(x, ...){
   print_title('Generalized dissimilarity mixed model (GDMM)', symb = '-')  # call
 
-  cat('Bayesian Bootstrapping with', m$n_boot, 'random samples\n\n')
+  cat('Bayesian Bootstrapping with', x$n_boot, 'random samples\n\n')
 
   cat('function call:\n')
-  print(m$call)
+  print(x$call)
   cat('\n')
 
   print_title2(' Details ', symb = '-')
-  if (m$mono) cat('- monotonic dissimilarity effects (mono = TRUE) \n')
-  cat('- distribution (family):', m$family, '\n')
-  cat('- link:', m$link, '\n\n')
+  if (x$mono) cat('- monotonic dissimilarity effects (mono = TRUE) \n')
+  cat('- distribution (family):', x$family, '\n')
+  cat('- link:', x$link, '\n\n')
 
   print_title2(' Predictors ', symb = '-')
 
   cat('- dissimilarity gradient(s): ')
-  if (!is.null(m$diss_formula)) {
-    print(m$diss_formula)
+  if (!is.null(x$diss_formula)) {
+    print(x$diss_formula)
   } else {
     cat('none included \n')
   }
 
   cat('- effect(s) on uniqueness: ')
-  if (!is.null(m$uniq_formula)) {
-    print(lme4::nobars(m$uniq_formula))
+  if (!is.null(x$uniq_formula)) {
+    print(lme4::nobars(x$uniq_formula))
   } else {
     cat('none included \n')
   }
 
   cat('- random effects: ')
-  cat(ifelse(length(m$re_vars) > 0, paste(m$re_vars,sep = ' ,'), 'none included \n'))
+  cat(ifelse(length(x$re_vars) > 0, paste(x$re_vars,sep = ' ,'), 'none included \n'))
 
   cat('\n')
   print_title2('', symb = '-')

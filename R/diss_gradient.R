@@ -32,7 +32,7 @@
 #'
 #' @importFrom hardhat forge
 #' @importFrom TMB sdreport
-#' @importFrom stats quantile
+#' @importFrom stats quantile median
 #'
 #' @export
 diss_gradient <- function(m,
@@ -55,7 +55,7 @@ diss_gradient <- function(m,
     sdr <- TMB::sdreport(m$obj)
     mean_beta <- sdr$value[names(sdr$value) == 'e_beta']
   } else if (class(m) == 'bbgdmm') {
-    mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, median)
+    mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, stats::median)
   }
 
   # SIM

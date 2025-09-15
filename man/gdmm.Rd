@@ -45,6 +45,8 @@ gdmm(
 
 \item{uniq_formula}{Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., \code{~ treatment + (1|site)}).}
 
+\item{pair_formula}{Formula specifying predictors for dissimilarity gradients. Variables must be numeric.}
+
 \item{mono}{Logical. If \code{TRUE}, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in \code{diss_formula}. Default is \code{FALSE}.}
 
 \item{mono_pair}{Logical. If \code{TRUE}, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in \code{pair_formula}. Default is \code{FALSE}.}

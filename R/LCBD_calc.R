@@ -13,12 +13,6 @@
 #'
 #' @return A numeric vector of length \code{nrow(x)}. If \code{LCBD = TRUE}, the values sum to 1.
 #'
-#' @examples
-#'
-#' d <- as.matrix(dist(matrix(rnorm(20), nrow = 5)))
-#' SS_calc(d)         # raw per-site SS
-#' SS_calc(d, TRUE)   # LCBD-like values
-#'
 #' @seealso \code{\link[adespatial]{LCBD.comp}}
 #'
 #' @keywords internal

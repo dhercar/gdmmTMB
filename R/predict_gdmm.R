@@ -5,7 +5,7 @@
 #' This method can predict dissimilarity or uniqueness for new data,
 #' with optional confidence intervals. Works with both regular gdmm and bootstrap bbgdmm objects.
 #'
-#' @param obj A fitted model object of class 'gdmm' or 'bbgdmm'
+#' @param object A fitted model object of class 'gdmm' or 'bbgdmm'
 #' @param new_X A data frame or matrix of new predictor variables for the dissimilarity component.
 #'   If NULL (default), uses the original data from the fitted model.
 #' @param new_X_pair A data frame or matrix of new pairwise predictor variables for the dissimilarity component, usually distances.
@@ -26,7 +26,8 @@
 #'   If NULL, uses 1000 for 'gdmm' objects and the number of bootstrap samples for 'bbgdmm' objects.
 #' @param n_cores Integer specifying the number of cores to use for parallel computation.
 #'   Currently not implemented. Default is 1.
-#'
+#' @param ... Additional parameters (not used).
+#' @method predict gdmm
 #' @return
 #' If \code{CI = FALSE}, returns a numeric vector of predictions.
 #' If \code{CI = TRUE}, returns a matrix with columns for the mean prediction and
@@ -53,7 +54,7 @@
 #' @importFrom utils combn
 #' @export
 #'
-predict.gdmm <- function(obj,
+predict.gdmm <- function(object,
                          new_X = NULL,
                          new_W = NULL,
                          new_X_pair = NULL,
@@ -66,15 +67,16 @@ predict.gdmm <- function(obj,
                          CI = TRUE,
                          CI_quant = c(0.95, 0.5),
                          n_sim = NULL,
-                         n_cores = 1) {
+                         n_cores = 1,
+                         ...) {
 
   # conditional predictions if no data is provided
   if (is.null(new_X) & is.null(new_W) & is.null(new_re) & is.null(new_X_pair)) {
-    new_X <- obj$X
-    new_X_pair <- obj$X_pair
-    new_D <- obj$D
-    new_W <- obj$X
-    new_re <- obj$X[,obj$re_vars, drop = FALSE]
+    new_X <- object$X
+    new_X_pair <- object$X_pair
+    new_D <- object$D
+    new_W <- object$X
+    new_re <- object$X[,object$re_vars, drop = FALSE]
   }
 
   if (is.null(new_W)) {
@@ -105,14 +107,14 @@ predict.gdmm <- function(obj,
 
   # ----- EXPECTED VALUE -----
   if (inherits(obj, 'gdmm')) {
-    beta <- obj$obj$report()$e_beta
-    beta_p <- obj$obj$report()$e_beta_p
-    lambda <- obj$obj$report()$lambda
-    intercept <- obj$obj$report()$intercept
-    u <- obj$obj$report()$u
-    sigma <- obj$obj$report()$sigma_re[obj$re_vars %in% re_sd]
+    beta <- object$obj$report()$e_beta
+    beta_p <- object$obj$report()$e_beta_p
+    lambda <- object$obj$report()$lambda
+    intercept <- object$obj$report()$intercept
+    u <- object$obj$report()$u
+    sigma <- object$obj$report()$sigma_re[object$re_vars %in% re_sd]
   } else if (inherits(obj, 'bbgdmm')) {
-    mean_par <- colMeans(obj$boot_samples[,colnames(obj$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
+    mean_par <- colMeans(object$boot_samples[,colnames(object$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
     beta <- mean_par[names(mean_par) == 'e_beta']
     beta_p <-mean_par[names(mean_par) == 'e_beta_p']
     lambda <- mean_par[names(mean_par) == 'lambda']
@@ -123,7 +125,7 @@ predict.gdmm <- function(obj,
 
   # Mean value
   out <- coef_to_pred(
-    obj = obj,
+    object = object,
     intercept = intercept,
     beta = beta,
     beta_p = beta_p,
@@ -144,12 +146,12 @@ predict.gdmm <- function(obj,
   if (CI == TRUE) {
     # Param combinations
     if (inherits(obj, 'bbgdmm')) {
-      if (is.null(n_sim)) n_sim = obj$n_boot
-      sims <- obj$boot_samples[,colnames(obj$boot_samples) %in% c('e_beta','e_beta_p', 'lambda', 'intercept')]
+      if (is.null(n_sim)) n_sim = object$n_boot
+      sims <- object$boot_samples[,colnames(object$boot_samples) %in% c('e_beta','e_beta_p', 'lambda', 'intercept')]
 
     } else if (inherits(obj, 'gdmm'))  {
       if (is.null(n_sim)) n_sim = 1000
-      sdr <- TMB::sdreport(obj$obj)
+      sdr <- TMB::sdreport(object$obj)
       sims <- MASS::mvrnorm(n_sim, sdr$value,  sdr$cov)
     }
 
@@ -161,7 +163,7 @@ predict.gdmm <- function(obj,
       intercept_i <- sims[i, colnames(sims) == 'intercept']
       u_i <- u #sims[i, colnames(sims) == 'u']
 
-      pred_list[[length(pred_list)+1]] <- coef_to_pred(obj = obj,
+      pred_list[[length(pred_list)+1]] <- coef_to_pred(object = object,
                                 intercept = intercept_i,
                                 beta = beta_i,
                                 beta_p = beta_p_i,
@@ -190,6 +192,7 @@ predict.gdmm <- function(obj,
 #'
 #' @describeIn predict.gdmm Method for bootstrap gdmm objects
 #' @export
+#' @method predict bbgdmm
 predict.bbgdmm <- predict.gdmm
 
 
@@ -198,7 +201,7 @@ predict.bbgdmm <- predict.gdmm
 #' Internal function that transforms model parameters and new data into
 #' dissimilarity or uniqueness predictions.
 #'
-#' @param obj Model object containing fitted model components
+#' @param object Model object containing fitted model components
 #' @param intercept Numeric, model intercept
 #' @param beta Numeric vector, coefficients for dissimilarity component
 #' @param beta_p Numeric vector, coefficients for dissimilarity component (pairwise)
@@ -218,11 +221,11 @@ predict.bbgdmm <- predict.gdmm
 #' @return Numeric vector of predictions (dissimilarities or uniqueness values)
 #'
 #' @keywords internal
-coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
+coef_to_pred <- function(object, intercept, beta, beta_p, lambda, u,
                          new_W, new_X, new_X_pair, new_re, D, n, component, scale_uniq, type, sigma) {
 
   if ((length(lambda) > 0) & !is.null(new_W)) {
-    form_W_new <- as.matrix(hardhat::forge(new_W, obj$form_W$blueprint)$predictors)
+    form_W_new <- as.matrix(hardhat::forge(new_W, object$form_W$blueprint)$predictors)
     uniq_comp_pair <- (form_W_new[D[,1],,drop = F] + form_W_new[D[,2],,drop = F]) %*% lambda
     #uniq_comp <- form_W_new %*% lambda
   } else {
@@ -232,14 +235,14 @@ coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
 
 
   if ((length(beta) > 0) & !is.null(new_X)) {
-    form_X_new <- as.matrix(hardhat::forge(new_X, obj$form_X$blueprint)$predictors)
+    form_X_new <- as.matrix(hardhat::forge(new_X, object$form_X$blueprint)$predictors)
     diss_comp = abs(form_X_new[D[,1],, drop = F] - form_X_new[D[,2],,drop = F]) %*% c(beta)
   } else {
     diss_comp = 0
   }
 
   if ((length(beta_p) > 0) & !is.null(new_X_pair)) {
-    form_X_p_new <- as.matrix(hardhat::forge(new_X_pair, obj$form_X_pair$blueprint)$predictors)
+    form_X_p_new <- as.matrix(hardhat::forge(new_X_pair, object$form_X_pair$blueprint)$predictors)
     diss_p_comp = form_X_p_new %*% beta_p
   } else {
     diss_p_comp = 0
@@ -248,13 +251,13 @@ coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
 
   # Random effects matrix
   if (!is.null(new_re) & (length(new_re) > 0)) {
-    if (!(all(colnames(new_re) %in% obj$re_vars))) stop('random variable(s) "', paste(colnames(new_re)[which(!(colnames(new_re) %in% obj$re_vars))], sep = ', '), '" in `new_re` not found in model object')
+    if (!(all(colnames(new_re) %in% object$re_vars))) stop('random variable(s) "', paste(colnames(new_re)[which(!(colnames(new_re) %in% object$re_vars))], sep = ', '), '" in `new_re` not found in model object')
     new_re_vars <- colnames(new_re)
     new_Z <- sparse.model.matrix(eval(parse(text = paste0('~ 0 + ', paste0(new_re_vars, collapse = ' + ')))),
                                  data = new_re)
 
-    if (!(all(colnames(new_Z) %in% colnames(obj$Z_design)))) stop('new levels for random variables are not allowed\n','   new levels found:', paste0(colnames(new_Z)[which(!(colnames(new_Z) %in% colnames(obj$Z_design)))], sep = ', '))
-    u <- u[match(colnames(new_Z), colnames(obj$Z_design))]
+    if (!(all(colnames(new_Z) %in% colnames(object$Z_design)))) stop('new levels for random variables are not allowed\n','   new levels found:', paste0(colnames(new_Z)[which(!(colnames(new_Z) %in% colnames(object$Z_design)))], sep = ', '))
+    u <- u[match(colnames(new_Z), colnames(object$Z_design))]
     re_comp <- new_Z %*% (u)
     re_comp_pair <- re_comp[D[,1]] + re_comp[D[,2]]
 
@@ -268,7 +271,7 @@ coef_to_pred <- function(obj, intercept, beta, beta_p, lambda, u,
 
 
   if (type == 'response') {
-    pred_diss <- switch(obj$link,
+    pred_diss <- switch(object$link,
                         'identity' = pred_diss,
                         'logit' = inv_logit(pred_diss),
                         'neg_exp' = 1 - exp(-pred_diss),

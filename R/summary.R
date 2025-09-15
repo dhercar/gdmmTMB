@@ -130,10 +130,11 @@ summary.bbgdmm <- function(object,
 #' Internal print method for objects of class \code{summary.gdmm}.
 #'
 #' @param x An object of class \code{summary.gdmm}.
+#' @param ... Additional parameters (not used)
 #' @method print summary.gdmm
 #' @export
 #' @noRd
-print.summary.gdmm <- function(x) {
+print.summary.gdmm <- function(x, ...) {
   print_title('GDMM SUMMARY', symb = '-')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
@@ -166,10 +167,11 @@ print.summary.gdmm <- function(x) {
 #' Internal print method for objects of class \code{summary.bbgdmm}.
 #'
 #' @param x An object of class \code{summary.bbgdmm}.
+#' @param ... Additional parameters (not used)
 #' @method print summary.bbgdmm
 #' @export
 #' @noRd
-print.summary.bbgdmm <- function(x) {
+print.summary.bbgdmm <- function(x, ...) {
   print_title('BBGDMM SUMMARY', symb = '-')  # call
   cat("call:\n\n")
   call_str <- deparse(x$call)
