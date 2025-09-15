@@ -15,11 +15,13 @@
 #' @param na.rm Remove rows with NA?
 #' @param na.replace Replace NAs with specific value
 #'
-#' @return A data frame the following columns
+#' @return A data frame with the following columns
 #' \itemize{
 #'   \item s1, s2  -  A combination of sites (rows).
 #'   \item Additional columns indicating the dissimilarity between sites.
 #' }
+#'
+#' @importFrom vegan vegdist designdist
 #'
 #' @examples
 #'
@@ -35,8 +37,8 @@
 #'
 #' head(com)
 #'
-#'@export
-#'
+#'@keywords internal
+
 make_y_df <-
   function(com = NULL,
            D = NULL,

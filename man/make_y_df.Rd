@@ -45,7 +45,7 @@ make_y_df(
 \item{na.replace}{Replace NAs with specific value}
 }
 \value{
-A data frame the following columns
+A data frame with the following columns
 \itemize{
 \item s1, s2  -  A combination of sites (rows).
 \item Additional columns indicating the dissimilarity between sites.
@@ -69,3 +69,4 @@ com <- make_y_df(com = data,
 head(com)
 
 }
+\keyword{internal}
