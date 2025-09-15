@@ -2,9 +2,27 @@
 % Please edit documentation in R/predict_gdmm.R
 \name{predict.gdmm}
 \alias{predict.gdmm}
+\alias{predict.bbgdmm}
 \title{Predict method for gdmm and bbgdmm objects}
 \usage{
 \method{predict}{gdmm}(
+  obj,
+  new_X = NULL,
+  new_W = NULL,
+  new_X_pair = NULL,
+  new_re = NULL,
+  new_D = NULL,
+  re_sd = logical(0),
+  component = "dissimilarity",
+  scale_uniq = TRUE,
+  type = "response",
+  CI = TRUE,
+  CI_quant = c(0.95, 0.5),
+  n_sim = NULL,
+  n_cores = 1
+)
+
+\method{predict}{bbgdmm}(
   obj,
   new_X = NULL,
   new_W = NULL,
@@ -31,7 +49,7 @@ If NULL (default), uses the original data from the fitted model.}
 
 \item{new_X_pair}{A data frame or matrix of new pairwise predictor variables for the dissimilarity component, usually distances.}
 
-\item{new_re}{A data frame of new random effect variables. If NULL, uses the random effect}
+\item{new_re}{A data frame of new random effect variables. If NULL, uses random effects in the fitted model}
 
 \item{new_D}{Matrix of pairwise combination indices. Required when new_X_pair is provided.}
 
@@ -79,4 +97,11 @@ For 'gdmm' objects, confidence intervals are computed using parametric bootstrap
 When \code{component = "uniqueness"}, the function computes site-level uniqueness
 values based on the full dissimilarity matrix. When \code{component = "dissimilarity"},
 it returns pairwise dissimilarity predictions.
+If site-level random effects are included via \code{uniq_formula} when fitting the model (e.g.,\code{uniq_formula = (1|site)}),
+confidence intervals can incorporate site-level uncertainty via \code{re_sd = c('site')}.
 }
+\section{Functions}{
+\itemize{
+\item \code{predict(bbgdmm)}: Method for bootstrap gdmm objects
+
+}}
