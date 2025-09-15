@@ -45,27 +45,29 @@ gdmm(
 
 \item{uniq_formula}{Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., \code{~ treatment + (1|site)}).}
 
-\item{mono}{Logical. If TRUE, enforces monotonic (non-decreasing) dissimilarity effects. Default is FALSE.}
+\item{mono}{Logical. If \code{TRUE}, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in \code{diss_formula}. Default is \code{FALSE}.}
 
-\item{family}{Distribution family for the response. One of "normal", "binomial", or "beta". Default is "normal".}
+\item{mono_pair}{Logical. If \code{TRUE}, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in \code{pair_formula}. Default is \code{FALSE}.}
 
-\item{link}{Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.}
+\item{family}{Distribution family for the response. One of \code{"normal"}, \code{"binomial"}, or \code{"beta"}. Default is \code{"normal"}.}
+
+\item{link}{Link function. If \code{NULL} (default), automatically chosen based on family: \code{"identity"} for normal, \code{"logit"} for binomial/beta.}
 
 \item{scale_diss}{Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values. Useful when using a beta distribution if some dissimilarities are exactly 0 and/or 1.}
 
-\item{binary}{Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is FALSE.}
+\item{binary}{Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is \code{FALSE}.}
 
-\item{method}{Dissimilarity method applied to Y. See \href{https://rdrr.io/cran/vegan/man/vegdist.html}{\code{vegan::vegdist()}} for a list of compatible methods. Default is "bray".}
+\item{method}{Dissimilarity method applied to Y. See \href{https://rdrr.io/cran/vegan/man/vegdist.html}{\code{vegan::vegdist()}} for a list of compatible methods. Default is \code{"bray"}.}
 
 \item{control}{List of control parameters passed to nlminb optimizer (e.g., \code{control = list(rel.tol = 1e-8, iter.max = 500)}).}
 
-\item{trace}{Logical. If TRUE, prints information during optimization. Default is FALSE.}
+\item{trace}{Logical. If \code{TRUE}, prints information during optimization. Default is \code{FALSE}.}
 
-\item{bboot}{Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.}
+\item{bboot}{Logical. If \code{TRUE}, performs Bayesian bootstrapping. Default is \code{FALSE}.}
 
 \item{n_boot}{Integer. Number of bootstrap samples when \code{bboot = TRUE}. Default is 1000.}
 
-\item{n_cores}{Integer. Number of cores for parallel processing during bootstrapping. If NULL, uses \code{detectCores() - 2}.}
+\item{n_cores}{Integer. Number of cores for parallel processing during bootstrapping. If \code{NULL}, uses \code{detectCores() - 2}.}
 }
 \value{
 For \code{bboot = FALSE}: An object of class "gdmm" containing model fit, parameters, and diagnostics.

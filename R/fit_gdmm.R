@@ -8,17 +8,18 @@
 #' @param X_pair Data frame containing predictor variables as pairwise distances.
 #' @param diss_formula Formula specifying predictors for dissimilarity gradients. All variables must be numeric. `isp()` can be used in combination with `mono = TRUE` to fit monotonic I-splines (e.g., `~ isp(elevation) + isp(temperature)`).
 #' @param uniq_formula Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., `~ treatment + (1|site)`).
-#' @param mono Logical. If TRUE, enforces monotonic (non-decreasing) dissimilarity effects. Default is FALSE.
-#' @param family Distribution family for the response. One of "normal", "binomial", or "beta". Default is "normal".
-#' @param link Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.
+#' @param mono Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `diss_formula`. Default is `FALSE`.
+#' @param mono_pair Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `pair_formula`. Default is `FALSE`.
+#' @param family Distribution family for the response. One of `"normal"`, `"binomial"`, or `"beta"`. Default is `"normal"`.
+#' @param link Link function. If `NULL` (default), automatically chosen based on family: `"identity"` for normal, `"logit"` for binomial/beta.
 #' @param scale_diss Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values. Useful when using a beta distribution if some dissimilarities are exactly 0 and/or 1.
-#' @param binary Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is FALSE.
-#' @param method Dissimilarity method applied to Y. See [`vegan::vegdist()`](https://rdrr.io/cran/vegan/man/vegdist.html) for a list of compatible methods. Default is "bray".
+#' @param binary Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is `FALSE`.
+#' @param method Dissimilarity method applied to Y. See [`vegan::vegdist()`](https://rdrr.io/cran/vegan/man/vegdist.html) for a list of compatible methods. Default is `"bray"`.
 #' @param control List of control parameters passed to nlminb optimizer (e.g., `control = list(rel.tol = 1e-8, iter.max = 500)`).
-#' @param trace Logical. If TRUE, prints information during optimization. Default is FALSE.
-#' @param bboot Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.
+#' @param trace Logical. If `TRUE`, prints information during optimization. Default is `FALSE`.
+#' @param bboot Logical. If `TRUE`, performs Bayesian bootstrapping. Default is `FALSE`.
 #' @param n_boot Integer. Number of bootstrap samples when `bboot = TRUE`. Default is 1000.
-#' @param n_cores Integer. Number of cores for parallel processing during bootstrapping. If NULL, uses `detectCores() - 2`.
+#' @param n_cores Integer. Number of cores for parallel processing during bootstrapping. If `NULL`, uses `detectCores() - 2`.
 #'
 #' @description
 #' Fits a generalized dissimilarity mixed model (gdmm) for ecological community data.
