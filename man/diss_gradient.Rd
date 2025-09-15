@@ -29,28 +29,23 @@ diss_gradient(
 \value{
 A named list of data frames, one for each variable in \code{var}. Each data frame contains:
 \itemize{
-\item \code{var}: The variable name.
-\item \code{f_x}: The predicted dissimilarity response.
+\item \code{var}: Variable names.
+\item \code{f_x}: Predicted value after fitted non-linear transformation (e.g., monotonic I-splines).
 \item \code{x}: The values of the focal gradient.
 \item \code{CI lower / CI upper}: (Optional) Lower and upper bounds of the confidence interval.
 }
 }
 \description{
 Computes the predicted effect of one or more covariates on compositional dissimilarity
-from a fitted \code{gdmm} or \code{bbgdmm} model. Optionally returns uncertainty bands (credible or confidence intervals)
+from a fitted \code{gdmm} or \code{bbgdmm} model. Optionally, returns uncertainty bands (credible or confidence intervals)
 using either bootstrapped samples or parametric bootstrapping.
 }
 \details{
 The function generates predicted dissimilarities along a gradient of each specified predictor,
-while holding all other predictors constant at their minimum observed values. If \code{CI = TRUE},
+while holding all other predictors constant. If \code{CI = TRUE},
 it uses bootstrap samples (for \code{bbgdmm}) or simulates from the joint covariance matrix (for \code{gdmm})
 to construct confidence or credible intervals.
 
-This approach is useful for visualizing how compositional changes to individual
-environmental or spatial gradients, as part of a generalized dissimilarity modeling framework (Ferrier et al., 2007).
-}
-\references{
-Ferrier, S., Manion, G., Elith, J., & Richardson, K. (2007).
-Using generalized dissimilarity modelling to analyse and predict patterns of beta diversity in regional biodiversity assessment.
-\emph{Diversity and Distributions}, 13(3), 252–264. \doi{10.1111/j.1472-4642.2007.00341.x}
+This approach is useful for visualizing directional compositional changes along individual
+environmental gradients.
 }
