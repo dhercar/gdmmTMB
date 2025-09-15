@@ -54,18 +54,18 @@ diss_gradient <- function(m,
   if (inherits(m, 'gdmm')) {
     sdr <- TMB::sdreport(m$obj)
     mean_beta <- sdr$value[names(sdr$value) == 'e_beta']
-  } else if (inherit(m, 'bbgdmm')) {
+  } else if (inherits(m, 'bbgdmm')) {
     mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, stats::median)
   }
 
   # SIM
   if (CI) {
     # Param combinations
-    if (inherit(m,'bbgdmm')) {
+    if (inherits(m,'bbgdmm')) {
       if (is.null(n_sim)) n_sim = m$n_boot
       sims <- m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F]
 
-    } else if (inherit(m, 'gdmm'))  {
+    } else if (inherits(m, 'gdmm'))  {
       if (is.null(n_sim)) n_sim = 1000
       sims <- MASS::mvrnorm(n_sim, sdr$value, sdr$cov)
     }
