@@ -73,18 +73,6 @@ inv_logit <- function(x) {
 }
 
 
-#' Scale a numeric vector 0,1
-#'
-#' Takes a numeric vector and linearly rescales it so that its minimum becomes 0 and its maximum becomes 1.
-#'
-#' @param x A numeric vector.
-#' @return A numeric vector of the same length as \code{x}, with values in the interval \[0, 1\]
-#' @export
-scale01 <- function(x) {
-  rng <- range(x, na.rm = TRUE)
-  (x - rng[1]) / (rng[2] - rng[1])
-}
-
 
 #' Scale a vector into an specified
 #'
