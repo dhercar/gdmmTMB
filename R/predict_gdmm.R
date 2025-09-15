@@ -106,14 +106,14 @@ predict.gdmm <- function(object,
 
 
   # ----- EXPECTED VALUE -----
-  if (inherits(obj, 'gdmm')) {
+  if (inherits(object, 'gdmm')) {
     beta <- object$obj$report()$e_beta
     beta_p <- object$obj$report()$e_beta_p
     lambda <- object$obj$report()$lambda
     intercept <- object$obj$report()$intercept
     u <- object$obj$report()$u
     sigma <- object$obj$report()$sigma_re[object$re_vars %in% re_sd]
-  } else if (inherits(obj, 'bbgdmm')) {
+  } else if (inherits(object, 'bbgdmm')) {
     mean_par <- colMeans(object$boot_samples[,colnames(object$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
     beta <- mean_par[names(mean_par) == 'e_beta']
     beta_p <-mean_par[names(mean_par) == 'e_beta_p']
