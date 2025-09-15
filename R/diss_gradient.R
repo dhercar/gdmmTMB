@@ -51,21 +51,21 @@ diss_gradient <- function(m,
   stopifnot(all(var %in% all.vars(m$diss_formula)))
 
   # Mean beta
-  if (class(m) == 'gdmm') {
+  if (inherits(m, 'gdmm')) {
     sdr <- TMB::sdreport(m$obj)
     mean_beta <- sdr$value[names(sdr$value) == 'e_beta']
-  } else if (class(m) == 'bbgdmm') {
+  } else if (inherit(m, 'bbgdmm')) {
     mean_beta <- apply(m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F], 2, stats::median)
   }
 
   # SIM
   if (CI) {
     # Param combinations
-    if (class(m) == 'bbgdmm') {
+    if (inherit(m,'bbgdmm')) {
       if (is.null(n_sim)) n_sim = m$n_boot
       sims <- m$boot_samples[,colnames(m$boot_samples) %in% c('e_beta'), drop = F]
 
-    } else if (class(m) == 'gdmm')  {
+    } else if (inherit(m, 'gdmm'))  {
       if (is.null(n_sim)) n_sim = 1000
       sims <- MASS::mvrnorm(n_sim, sdr$value, sdr$cov)
     }
