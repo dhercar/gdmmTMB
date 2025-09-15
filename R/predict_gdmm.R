@@ -44,6 +44,9 @@
 #' When \code{component = "uniqueness"}, the function computes site-level uniqueness
 #' values based on the full dissimilarity matrix. When \code{component = "dissimilarity"},
 #' it returns pairwise dissimilarity predictions.
+#' If site-level random effects are included via \code{uniq_formula} when fitting the model (e.g.,\code{uniq_formula = (1|site)}),
+#' confidence intervals can incorporate site-level uncertainty via \code{re_sd = c('site')}.
+#'
 #' @importFrom hardhat forge
 #' @importFrom MASS mvrnorm
 #' @importFrom stats rnorm quantile

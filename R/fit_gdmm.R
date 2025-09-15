@@ -1,24 +1,38 @@
-#' Fit Generalized Dissimilarity Mixed Model (GDMM)
+#' Fit Generalized Dissimilarity Mixed Model (GDMM).
 #'
-#' @param Y Response matrix (e.g., species x site matrix). Either Y or Y_diss must be provided.
-#' @param Y_diss Pre-calculated dissimilarity values between site pairs. If provided, D must also be supplied.
-#' @param Y_den Denominator values for Jaccard, Sorensen or Bray-Curtis dissimilarities when using Y_diss. Required when family = "binomial" and Y_diss is provided.
+#' @param Y Response matrix (e.g., site x species matrix). Either Y or Y_diss must be provided.
+#' @param Y_diss Pre-calculated dissimilarity values between site pairs. If provided, D must also be supplied. Either Y or Y_diss must be provided.
+#' @param Y_den Denominator values for Jaccard, Sørensenensen or Bray-Curtis dissimilarities when using Y_diss. Required when family = "binomial" and Y_diss is provided.
 #' @param D Data frame or matrix with two columns specifying site pairs (indices) corresponding to Y_diss values. Only required when Y_diss is provided.
 #' @param X Data frame containing predictor variables as site-level values.
 #' @param X_pair Data frame containing predictor variables as pairwise distances.
-#' @param diss_formula Formula specifying predictors for dissimilarity gradients. All variables must be numeric. `isp(c)` can be used in combination with `mono = TRUE` to fit monotonic I-splines (e.g., `~ elevation + temperature`).
+#' @param diss_formula Formula specifying predictors for dissimilarity gradients. All variables must be numeric. `isp()` can be used in combination with `mono = TRUE` to fit monotonic I-splines (e.g., `~ isp(elevation) + isp(temperature)`).
 #' @param uniq_formula Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., `~ treatment + (1|site)`).
 #' @param mono Logical. If TRUE, enforces monotonic (non-decreasing) dissimilarity effects. Default is FALSE.
 #' @param family Distribution family for the response. One of "normal", "binomial", or "beta". Default is "normal".
 #' @param link Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.
-#' @param scale_diss Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values.
-#' @param binary Logical. Whether to treat response as binary data before calculating dissimilarity from Y. Default is FALSE.
-#' @param method Dissimilarity method applied to Y. One of "bray", "sorensen", "jaccard". Default is "bray".
+#' @param scale_diss Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values. Useful when using a beta distribution if some dissimilarities are exactly 0 and/or 1.
+#' @param binary Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is FALSE.
+#' @param method Dissimilarity method applied to Y. See [`vegan::vegdist()`](https://rdrr.io/cran/vegan/man/vegdist.html) for a list of compatible methods. Default is "bray".
 #' @param control List of control parameters passed to nlminb optimizer (e.g., `control = list(rel.tol = 1e-8, iter.max = 500)`).
-#' @param trace Logical. If TRUE, prints optimization  information. Default is FALSE.
+#' @param trace Logical. If TRUE, prints information during optimization. Default is FALSE.
 #' @param bboot Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.
 #' @param n_boot Integer. Number of bootstrap samples when `bboot = TRUE`. Default is 1000.
 #' @param n_cores Integer. Number of cores for parallel processing during bootstrapping. If NULL, uses `detectCores() - 2`.
+#'
+#' @description
+#' Fits a generalized dissimilarity mixed model (gdmm) for ecological community data.
+#' The model can estimate the effect of predictors on community dissimilarity
+#' and uniqueness simultaneously.
+#'
+#' The function supports two options for estimation:
+#' * Hierarchical structure via site-level random effects in `uniq_formula` (e.g., `~ ... + (1|site)`).
+#' * Bayesian bootstrapping (`bboot = TRUE`) to obtain site-level uncertainty in parameter estimates.
+#'
+#' Dissimilarity gradients are specified in `diss_formula`, which may include non-linear transformations
+#' such as monotonic I-splines (`isp(x)` with `mono = TRUE`) to allow flexible monotonic responses.
+#'
+#' Direct effects on community uniqueness are supported via `uniq_formula`.
 #'
 #' @return For `bboot = FALSE`: An object of class "gdmm" containing model fit, parameters, and diagnostics.
 #'         For `bboot = TRUE`: An object of class "bbgdmm" containing bootstrap samples and model information.
@@ -309,7 +323,7 @@ gdmm <- function(Y = NULL,
 
   #### BAYESIAN BOOTSTRAPPING ####
   } else if (bboot == TRUE) {
-    if (is.null(n_cores))  n_cores = parallel::detectCores(logical = TRUE) - 2
+    if (is.null(n_cores))  n_cores = max(parallel::detectCores(logical = TRUE) - 2, 1)
 
     cl <- makeCluster(n_cores)
     registerDoParallel(cl)

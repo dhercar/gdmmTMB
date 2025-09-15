@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_gdmm.R
 \name{gdmm}
 \alias{gdmm}
-\title{Fit Generalized Dissimilarity Mixed Model (GDMM)}
+\title{Fit Generalized Dissimilarity Mixed Model (GDMM).}
 \usage{
 gdmm(
   Y = NULL,
@@ -29,11 +29,11 @@ gdmm(
 )
 }
 \arguments{
-\item{Y}{Response matrix (e.g., species x site matrix). Either Y or Y_diss must be provided.}
+\item{Y}{Response matrix (e.g., site x species matrix). Either Y or Y_diss must be provided.}
 
-\item{Y_diss}{Pre-calculated dissimilarity values between site pairs. If provided, D must also be supplied.}
+\item{Y_diss}{Pre-calculated dissimilarity values between site pairs. If provided, D must also be supplied. Either Y or Y_diss must be provided.}
 
-\item{Y_den}{Denominator values for Jaccard, Sorensen or Bray-Curtis dissimilarities when using Y_diss. Required when family = "binomial" and Y_diss is provided.}
+\item{Y_den}{Denominator values for Jaccard, Sørensenensen or Bray-Curtis dissimilarities when using Y_diss. Required when family = "binomial" and Y_diss is provided.}
 
 \item{D}{Data frame or matrix with two columns specifying site pairs (indices) corresponding to Y_diss values. Only required when Y_diss is provided.}
 
@@ -41,7 +41,7 @@ gdmm(
 
 \item{X_pair}{Data frame containing predictor variables as pairwise distances.}
 
-\item{diss_formula}{Formula specifying predictors for dissimilarity gradients. All variables must be numeric. \code{isp(c)} can be used in combination with \code{mono = TRUE} to fit monotonic I-splines (e.g., \code{~ elevation + temperature}).}
+\item{diss_formula}{Formula specifying predictors for dissimilarity gradients. All variables must be numeric. \code{isp()} can be used in combination with \code{mono = TRUE} to fit monotonic I-splines (e.g., \code{~ isp(elevation) + isp(temperature)}).}
 
 \item{uniq_formula}{Formula specifying predictors and random effects for uniqueness. Uses lme4-style syntax for random effects (e.g., \code{~ treatment + (1|site)}).}
 
@@ -51,15 +51,15 @@ gdmm(
 
 \item{link}{Link function. If NULL (default), automatically chosen based on family: "identity" for normal, "logit" for binomial/beta.}
 
-\item{scale_diss}{Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values.}
+\item{scale_diss}{Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values. Useful when using a beta distribution if some dissimilarities are exactly 0 and/or 1.}
 
-\item{binary}{Logical. Whether to treat response as binary data before calculating dissimilarity from Y. Default is FALSE.}
+\item{binary}{Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is FALSE.}
 
-\item{method}{Dissimilarity method applied to Y. One of "bray", "sorensen", "jaccard". Default is "bray".}
+\item{method}{Dissimilarity method applied to Y. See \href{https://rdrr.io/cran/vegan/man/vegdist.html}{\code{vegan::vegdist()}} for a list of compatible methods. Default is "bray".}
 
 \item{control}{List of control parameters passed to nlminb optimizer (e.g., \code{control = list(rel.tol = 1e-8, iter.max = 500)}).}
 
-\item{trace}{Logical. If TRUE, prints optimization  information. Default is FALSE.}
+\item{trace}{Logical. If TRUE, prints information during optimization. Default is FALSE.}
 
 \item{bboot}{Logical. If TRUE, performs Bayesian bootstrapping. Default is FALSE.}
 
@@ -72,5 +72,18 @@ For \code{bboot = FALSE}: An object of class "gdmm" containing model fit, parame
 For \code{bboot = TRUE}: An object of class "bbgdmm" containing bootstrap samples and model information.
 }
 \description{
-Fit Generalized Dissimilarity Mixed Model (GDMM)
+Fits a generalized dissimilarity mixed model (gdmm) for ecological community data.
+The model can estimate the effect of predictors on community dissimilarity
+and uniqueness simultaneously.
+
+The function supports two options for estimation:
+\itemize{
+\item Hierarchical structure via site-level random effects in \code{uniq_formula} (e.g., \code{~ ... + (1|site)}).
+\item Bayesian bootstrapping (\code{bboot = TRUE}) to obtain site-level uncertainty in parameter estimates.
+}
+
+Dissimilarity gradients are specified in \code{diss_formula}, which may include non-linear transformations
+such as monotonic I-splines (\code{isp(x)} with \code{mono = TRUE}) to allow flexible monotonic responses.
+
+Direct effects on community uniqueness are supported via \code{uniq_formula}.
 }
