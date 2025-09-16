@@ -14,32 +14,40 @@ The package `gdmmTMB` provides functions for fitting and interrogating Generalis
 devtools::install_github('dhercar/gdmmTMB')
 ```
 
-# A brief introduction to `gdmmTMB`
-
-ToDo
-
 # Example
-
-Prep data
+We start with two matrices: A community matrix (site x species) and a matrix of environmental covariates. 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(gdmmTMB)
 
+# Community matrix
 sp <- gdm::southwest %>% select(site, species) %>% 
   group_by(site, species) %>%
   summarise(n = 1) %>%
   pivot_wider(id_cols = site, names_from = species,values_from = n, values_fill = 0 ) %>%
   arrange(site)
-kableExtra::kable(head(sp))
-
-env <- gdm::southwest %>% select(-c(species)) %>%
-  distinct() %>% arrange(site)
-kableExtra::kable(head(env))
-
 ```
 
 
-Fit model
+```{r, message=FALSE, warning=FALSE, echo = FALSE}
+kableExtra::kable(head(sp))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+env <- gdm::southwest %>% select(-c(species)) %>%
+  distinct() %>% arrange(site)
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo = FALSE}
+kableExtra::kable(head(env))
+```
+
+
+### Fitting model 
+
+In this example, we specify a binomial distribution and estimate model parameters with a Bayesian bootstrapping approach. Monotonic I-splines for dissimilarity gradients (`diss_formula`) are specified via `isp(x)` and `mono = TRUE`.
 
 ```{r}
 m <- gdmm(Y = sp[,-1],
@@ -49,25 +57,25 @@ m <- gdmm(Y = sp[,-1],
             isp(bio15) + 
             isp(bio19),
           family = 'binomial',
-          n_boot = 100, # should be at least
-          bboot = T,
-          mono = T)
+          n_boot = 100, # should be at least 1000
+          bboot = TRUE,
+          mono = TRUE)
 ```
 
 
-Print summary
+### Model summary
 
 ```{r}
 summary(m)
 ```
 
 
-Obtain dissimilarity gradients
+### Plot dissimilarity gradients 
 ```{r, message=FALSE}
 f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
 ```
 
-Plot dissimilarity gradients
+
 ```{r}
 library(ggplot2)
 
