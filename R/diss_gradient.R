@@ -5,11 +5,11 @@
 #' from a fitted `gdmm` or `bbgdmm` model. Optionally, returns uncertainty bands (credible or confidence intervals)
 #' using either bootstrapped samples or parametric bootstrapping.
 #'
-#' @param m A fitted model object of class `gdmm` or `bbgdmm`, representing a generalized dissimilarity (mixed) model.
-#' @param var Character vector of variable names to evaluate. Use `"all"` (default) to compute for all predictors in the model.
+#' @param m A fitted model object of class `gdmm` or `bbgdmm`.
+#' @param var Character vector of variable names to evaluate. Use `"all"` (default) to use all predictors in the model.
 #' @param n Integer. Number of points to evaluate along each gradient. Defaults to 100.
 #' @param CI Logical. Whether to compute confidence intervals. Default is `TRUE`.
-#' @param n_sim Number of draws used to obtain CI. If `NULL`, uses `m$n_boot` for `bbgdmm` or 1000 for `gdmm`.
+#' @param n_sim Number of draws used to obtain CI. If `NULL`, uses `n_boot` for `bbgdmm` objects or 1000 for `gdmm`.
 #' @param CI_quant Numeric vector specifying the quantile coverage (e.g., `0.95` for 95% CI). Default is `0.95`.
 #'
 #' @details
