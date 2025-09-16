@@ -8,7 +8,7 @@ gdmmTMB
 
 The package `gdmmTMB` provides functions for fitting and interrogating
 Generalised Dissimilarity Mixed Models (GDMM) using maximum likelihood
-estimation, Laplace approximation and (optinally) Bayesian
+estimation, Laplace approximation and (optionally) Bayesian
 Bootstrapping.
 
 # Installation
@@ -18579,16 +18579,16 @@ summary(m)
     ## --------------------------------- Coeff. Table --------------------------------- 
     ## 
     ##                    Estimate  Std.Err.      2.5%       50%     97.5% pseudo-Z
-    ## diss: isp(bio6)1  3.098e-01 1.338e-01 5.873e-02 3.060e-01 5.454e-01   2.3151
-    ## diss: isp(bio6)2  9.915e-03 3.941e-02 1.001e-08 1.480e-08 1.272e-01   0.2516
-    ## diss: isp(bio6)3  8.240e-03 2.453e-02 1.000e-08 1.081e-08 9.361e-02   0.3359
-    ## diss: isp(bio15)1 8.320e-01 1.511e-01 5.828e-01 8.178e-01 1.137e+00   5.5061
-    ## diss: isp(bio15)2 1.063e-08 3.601e-09 1.000e-08 1.002e-08 1.294e-08   2.9519
-    ## diss: isp(bio15)3 1.155e-08 1.188e-08 1.000e-08 1.001e-08 1.704e-08   0.9726
-    ## diss: isp(bio19)1 1.946e+00 1.668e-01 1.651e+00 1.929e+00 2.309e+00  11.6698
-    ## diss: isp(bio19)2 1.045e-08 1.895e-09 1.000e-08 1.002e-08 1.270e-08   5.5180
-    ## diss: isp(bio19)3 1.032e-08 2.168e-09 1.000e-08 1.000e-08 1.162e-08   4.7614
-    ## (Intercept)       1.750e-01 6.982e-02 4.087e-02 1.713e-01 3.025e-01   2.5069
+    ## diss: isp(bio6)1  3.041e-01 1.479e-01 3.591e-02 2.996e-01 5.666e-01   2.0558
+    ## diss: isp(bio6)2  1.785e-02 5.134e-02 1.006e-08 1.508e-08 1.896e-01   0.3476
+    ## diss: isp(bio6)3  1.125e-02 3.215e-02 1.000e-08 1.146e-08 1.050e-01   0.3500
+    ## diss: isp(bio15)1 8.445e-01 1.607e-01 5.567e-01 8.334e-01 1.181e+00   5.2536
+    ## diss: isp(bio15)2 1.417e-08 2.314e-08 1.000e-08 1.002e-08 3.540e-08   0.6121
+    ## diss: isp(bio15)3 1.153e-08 1.390e-08 1.000e-08 1.000e-08 1.118e-08   0.8297
+    ## diss: isp(bio19)1 1.944e+00 1.693e-01 1.640e+00 1.941e+00 2.255e+00  11.4854
+    ## diss: isp(bio19)2 7.094e-05 7.091e-04 1.000e-08 1.000e-08 2.276e-08   0.1000
+    ## diss: isp(bio19)3 2.850e-08 1.822e-07 1.000e-08 1.000e-08 1.140e-08   0.1565
+    ## (Intercept)       1.716e-01 7.389e-02 3.069e-02 1.550e-01 3.147e-01   2.3219
     ##                   pseudo-Pval    
     ## diss: isp(bio6)1       < 0.01 ***
     ## diss: isp(bio6)2       < 0.01 ***
@@ -18608,8 +18608,8 @@ summary(m)
     ## signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 
     ## ---
     ## 
-    ## Marginal log-likelihood (average):  -42593.83 
-    ## AIC:  85207.67 , AICc:  85207.72 , BIC:  85271.49 
+    ## Marginal log-likelihood (average):  -42649.98 
+    ## AIC:  85319.96 , AICc:  85320.01 , BIC:  85383.79 
     ## 
     ## --------------------------------------------------------------------------------
 
