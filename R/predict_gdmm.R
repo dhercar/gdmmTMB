@@ -98,10 +98,6 @@ predict.gdmm <- function(object,
     }
 
     D <- as.matrix(new_D)
-
-    if (!all(new_D %in% 1:nrow(new_X))) {
-      stop("'new_D' should only contain integers between 1 and nrow(X_new)")
-    }
   }
 
 
