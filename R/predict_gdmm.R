@@ -145,11 +145,11 @@ predict.gdmm <- function(object,
 
   if (CI == TRUE) {
     # Param combinations
-    if (inherits(obj, 'bbgdmm')) {
+    if (inherits(object, 'bbgdmm')) {
       if (is.null(n_sim)) n_sim = object$n_boot
       sims <- object$boot_samples[,colnames(object$boot_samples) %in% c('e_beta','e_beta_p', 'lambda', 'intercept')]
 
-    } else if (inherits(obj, 'gdmm'))  {
+    } else if (inherits(object, 'gdmm'))  {
       if (is.null(n_sim)) n_sim = 1000
       sdr <- TMB::sdreport(object$obj)
       sims <- MASS::mvrnorm(n_sim, sdr$value,  sdr$cov)
