@@ -14,15 +14,15 @@ diss_gradient(
 )
 }
 \arguments{
-\item{m}{A fitted model object of class \code{gdmm} or \code{bbgdmm}, representing a generalized dissimilarity (mixed) model.}
+\item{m}{A fitted model object of class \code{gdmm} or \code{bbgdmm}.}
 
-\item{var}{Character vector of variable names to evaluate. Use \code{"all"} (default) to compute for all predictors in the model.}
+\item{var}{Character vector of variable names to evaluate. Use \code{"all"} (default) to use all predictors in the model.}
 
 \item{n}{Integer. Number of points to evaluate along each gradient. Defaults to 100.}
 
 \item{CI}{Logical. Whether to compute confidence intervals. Default is \code{TRUE}.}
 
-\item{n_sim}{Number of draws used to obtain CI. If \code{NULL}, uses \code{m$n_boot} for \code{bbgdmm} or 1000 for \code{gdmm}.}
+\item{n_sim}{Number of draws used to obtain CI. If \code{NULL}, uses \code{n_boot} for \code{bbgdmm} objects or 1000 for \code{gdmm}.}
 
 \item{CI_quant}{Numeric vector specifying the quantile coverage (e.g., \code{0.95} for 95\% CI). Default is \code{0.95}.}
 }
