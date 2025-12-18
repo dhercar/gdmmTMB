@@ -79,7 +79,7 @@ inv_logit <- function(x) {
 #' Given a numeric vector \code{x}, this function re-scales \code{x} into the interval \[\code{min}, \code{max}\].
 #'
 #' @param x A numeric vector
-#' @param new Numeric scalar: the upper nad lower bound of the target interval. Default is \[\code{0.01}, \code{0.99}\].
+#' @param new Numeric scalar: the upper and lower bound of the target interval. Default is \[\code{0.01}, \code{0.99}\].
 #' @return A numeric vector of the same length as \code{x}, with values in the interval \[\code{min(new)}, \code{max(new)}\].
 scale_dist <- function(x, new = c(0.01, 0.99)) {
   min(new) + x * (max(new) - min(new))
