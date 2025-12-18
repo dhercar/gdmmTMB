@@ -58,11 +58,11 @@ using either bootstrapped samples or parametric bootstrapping.</p>
 
 
 <dl><dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
-<dd><p>A fitted model object of class <code>gdmm</code> or <code>bbgdmm</code>, representing a generalized dissimilarity (mixed) model.</p></dd>
+<dd><p>A fitted model object of class <code>gdmm</code> or <code>bbgdmm</code>.</p></dd>
 
 
 <dt id="arg-var">var<a class="anchor" aria-label="anchor" href="#arg-var"></a></dt>
-<dd><p>Character vector of variable names to evaluate. Use <code>"all"</code> (default) to compute for all predictors in the model.</p></dd>
+<dd><p>Character vector of variable names to evaluate. Use <code>"all"</code> (default) to use all predictors in the model.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -74,7 +74,7 @@ using either bootstrapped samples or parametric bootstrapping.</p>
 
 
 <dt id="arg-n-sim">n_sim<a class="anchor" aria-label="anchor" href="#arg-n-sim"></a></dt>
-<dd><p>Number of draws used to obtain CI. If <code>NULL</code>, uses <code>m$n_boot</code> for <code>bbgdmm</code> or 1000 for <code>gdmm</code>.</p></dd>
+<dd><p>Number of draws used to obtain CI. If <code>NULL</code>, uses <code>n_boot</code> for <code>bbgdmm</code> objects or 1000 for <code>gdmm</code>.</p></dd>
 
 
 <dt id="arg-ci-quant">CI_quant<a class="anchor" aria-label="anchor" href="#arg-ci-quant"></a></dt>
@@ -103,7 +103,7 @@ environmental gradients.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by First Last.</p>
+  <p>Developed by Daniel Hernandez-Carrasco.</p>
 </div>
 
 <div class="pkgdown-footer-right">

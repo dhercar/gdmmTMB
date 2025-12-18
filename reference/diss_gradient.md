@@ -22,13 +22,12 @@ diss_gradient(
 
 - m:
 
-  A fitted model object of class `gdmm` or `bbgdmm`, representing a
-  generalized dissimilarity (mixed) model.
+  A fitted model object of class `gdmm` or `bbgdmm`.
 
 - var:
 
   Character vector of variable names to evaluate. Use `"all"` (default)
-  to compute for all predictors in the model.
+  to use all predictors in the model.
 
 - n:
 
@@ -41,8 +40,8 @@ diss_gradient(
 
 - n_sim:
 
-  Number of draws used to obtain CI. If `NULL`, uses `m$n_boot` for
-  `bbgdmm` or 1000 for `gdmm`.
+  Number of draws used to obtain CI. If `NULL`, uses `n_boot` for
+  `bbgdmm` objects or 1000 for `gdmm`.
 
 - CI_quant:
 

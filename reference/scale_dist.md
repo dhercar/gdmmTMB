@@ -17,7 +17,7 @@ scale_dist(x, new = c(0.01, 0.99))
 
 - new:
 
-  Numeric scalar: the upper nad lower bound of the target interval.
+  Numeric scalar: the upper and lower bound of the target interval.
   Default is \[`0.01`, `0.99`\].
 
 ## Value
