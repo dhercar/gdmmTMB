@@ -2,9 +2,11 @@ Package: gdmmTMB
 Title: Generalised Dissimilarity Mixed Models in R Using TMB
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Daniel", "Hernandez Carrasco", 
+    "daniel.hernandezcarrasco@canterbury.ac.nz",
+    role = c("aut", "cre"),
+    comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: An R package for fitting Generalised Dissimilarity Mixed Models (GDMM) with TMB.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
