@@ -38,7 +38,7 @@ Community uniqueness is often modelled as the Local Contribution to Beta Diversi
 
 The code below computes LCBD scores using the package `adespatial` [@dray2018package], and regresses them against pH and the quadratic pH term. 
 
-```{r, message=FALSE, warning=FALSE,  dev="svg", out.width="100%"}
+```{r, message=FALSE, warning=FALSE}
 
 LCBD <- adespatial::LCBD.comp(vegan::vegdist(Y))
 Xenv$LCBD <- LCBD$LCBD
@@ -57,7 +57,7 @@ In brief, effects on LCBD denote increasing or decreasing expected dissimilarity
 
 We can obtain the exact same relationship by modelling pairwise dissimilarities directly, by introducing site-level effects (see @hernandez2025accounting for details). This can be done in `gdmmTMB` via the `uniq_formula` argument:
 
-```{r, dev="svg", out.width="100%", results = 'hide'}
+```{r, results = 'hide'}
 # fit model
 m_gdmm <-
   gdmm(Y = Y,
@@ -100,7 +100,7 @@ m_gdmm3 <- gdmm(
 
 
 
-```{r, echo = F, message = F, dev="svg", out.width="100%"}
+```{r, echo = F, message = F}
 # generate predictions
 Xenv$pred_gdmm2 <- predict(m_gdmm2, component = 'uniqueness', new_X = Xenv, scale_uniq = TRUE, CI = F)
 
@@ -123,7 +123,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 The U-shaped relationship between LCBD and pH above indicates that sites with low and high pH host relatively more unique species. However, a representation of the variability in community composition reveals a strong directional change in community composition along the pH gradient. 
 
 
-```{r, echo = F, message = F, warning = F, error = F, dev="svg", out.width="100%", results = 'hide'}
+```{r, echo = F, message = F, warning = F, error = F, results = 'hide'}
 
 sp_dist <- as.matrix(vegan::vegdist(Y))
 
@@ -201,7 +201,7 @@ predict_nondir <- data.frame(
 ```
 
 
-```{r, echo = F, dev="svg", out.width="100%"}
+```{r, echo = F}
 cowplot::plot_grid(
 ggplot(predict_tot, aes(x = pH, y = mean)) + 
   ylab('E(LCBD)') + 
