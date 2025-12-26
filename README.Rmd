@@ -21,12 +21,10 @@ devtools::install_github('dhercar/gdmmTMB')
 
 The package `gdmmTMB` was designed primarily for the analysis of ecological datasets where a set of environmental variables is used to explain variability in species composition. 
 
-We start with two matrices: 
+For this example, we use two datasets available as part of the `gdm` package. We start with two matrices: 
 
 - `sp`: A community matrix (site x species) 
 - `env`: A matrix of environmental covariates. 
-
-For this example, we use two datasets available as part of the `gdm` package. 
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -64,7 +62,7 @@ $$
 
 where the dissimilarity between observations $i$ and $j$ depends on the number of unshared ($b_i, b_j$) and shared ($a_{ij}$) species. 
 
-By specifying a binomial distribution, the Jaccard dissimilarity index is modelled as the probability $\pi$ that a randomly chosen species from the combined species pool ($2a_{ij} + b_i + b_j$) is not shared between observations $i$ and $j$. 
+By specifying a binomial distribution, the Jaccard dissimilarity index is modelled as the probability $\pi$ that a randomly chosen species from the combined species pool ($a_{ij} + b_i + b_j$) is not shared between observations $i$ and $j$. 
 
 ### Model summary
 

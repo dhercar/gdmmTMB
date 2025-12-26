@@ -23,7 +23,7 @@ theme_set(theme_bw(base_size = 8))
 
 Although the response variable in a Generalised Dissimilarity Model (GDM) is a pairwise dissimilarity, `gdmmTMB` can also handle effects on community uniqueness that are mathematically equivalent to those in models where uniqueness metrics, such as the Local Contribution to Beta Diversity (LCBD), are the response. 
 
-This vignette showcases the usage of `gdmmTMB` to model community uniqueness using the dataset `microbialdata` available as part of the `gllvm` R package. The dataset contains the matrices `Y`, which contains abundances of over 900 species found across 56 microbial communities, and `Xenv`, which consists of multiple environmental variables measured at each site
+This vignette showcases the usage of `gdmmTMB` to model community uniqueness using the dataset `microbialdata` available as part of the `gllvm` R package. The dataset contains the matrices `Y`, with abundances of over 900 species found across 56 microbial communities, and `Xenv`, which consists of multiple environmental variables measured at each site
 
 ```{r}
 Xenv <- gllvm::microbialdata$Xenv
@@ -53,7 +53,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 
 ```
 
-In brief, effects on LCBD denote increasing or decreasing expected dissimilarity of each community to all other communities. The U-shaped relationship therefore indicates that communities at the extremes of the pH gradient are more dissimilar on average to all other communities, and therefore more unique. 
+In brief, effects on LCBD denote increasing or decreasing expected dissimilarities of each community to all other communities. The U-shaped relationship above therefore indicates that communities at the extremes of the pH gradient are more dissimilar on average to all other communities, and therefore more unique. 
 
 We can obtain the exact same relationship by modelling pairwise dissimilarities directly, by introducing site-level effects (see @hernandez2025accounting for details). This can be done in `gdmmTMB` via the `uniq_formula` argument:
 
@@ -77,7 +77,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
   
 ```
 
-Both models produce the exact same U-shaped relationship between `pH` and `LCBD`. However, modelling effects on uniqueness with pairwise dissimilarities allows accounting for the distribution of such dissimilarities with a more appropriate error distribution link function. For instance, a binomial error distribution can be specified via the `family` argument. We can also account for the non-independence of pairwise dissimilarities with a site-level random effect (`uniq_formula = ~ ... + (1|site)`), or with Bayesian bootstrapping (`bboot = TRUE`):
+Both models produce the exact same U-shaped relationship between `pH` and `LCBD`. However, modelling effects on uniqueness with pairwise dissimilarities allows accounting for the distribution of such dissimilarities with a more appropriate error distribution and link function. For instance, a binomial error distribution can be specified via the `family` argument. We can also account for the non-independence of pairwise dissimilarities with a site-level random effect (`uniq_formula = ~ ... + (1|site)`), or with Bayesian bootstrapping (`bboot = TRUE`):
 
 ```{r, echo = T, message = F, results = 'hide'}
 Xenv$site <- as.factor(1:nrow(Xenv))
@@ -123,7 +123,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 The U-shaped relationship between LCBD and pH above indicates that sites with low and high pH host relatively more unique species. However, a representation of the variability in community composition reveals a strong directional change in community composition along the pH gradient. 
 
 
-```{r, echo = F, message = F, warning = F, error = F}
+```{r, echo = F, message = F, warning = F, error = F, results='hide'}
 
 sp_dist <- as.matrix(vegan::vegdist(Y))
 
@@ -133,8 +133,9 @@ kk_ord$stress
 points <- data.frame(kk_ord$points)
 points$pH <- Xenv$pH
 points$LCBD <- adespatial::LCBD.comp(vegan::vegdist(Y))$LCBD
+```
 
-
+```{r, echo = F, message = F}
 (plot_NMDS <- ggplot(points, aes(x = MDS1, y = MDS2, fill = pH )) + 
     theme_void() +
     ggtitle(paste0('NMDS | stress: ', round(kk_ord$stress, 3))) +
@@ -152,7 +153,6 @@ points$LCBD <- adespatial::LCBD.comp(vegan::vegdist(Y))$LCBD
     coord_equal() +
     scale_fill_gradientn(colours = c('steelblue4', 'grey90', 'darkred')))
 ```
-
 
 Sites at either end of the pH gradient are therefore further from the centroid (i.e., they present a higher average dissimilarity to all other sites), which could underpin the U-shaped relationship between LCBD and pH. We refer to the contribution of directional changes in community composition to the observed beta diversity patterns as 'directional effects'. Directional effects can be accounted for by making the expected dissimilarity between sites a function of their environmental distance [@mokany2022working]. In `gdmmTMB`, these directional effects are introduced via the `diss_formula` argument: 
 
