@@ -174,6 +174,49 @@ sites with low and high pH host relatively more unique species. However,
 a representation of the variability in community composition reveals a
 strong directional change in community composition along the pH
 gradient.</p>
+<pre><code><span><span class="co">#&gt; Run 0 stress 0.09250775 </span></span>
+<span><span class="co">#&gt; Run 1 stress 0.138292 </span></span>
+<span><span class="co">#&gt; Run 2 stress 0.09250775 </span></span>
+<span><span class="co">#&gt; ... New best solution</span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 2.049678e-05  max resid 0.0001001463 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 3 stress 0.09250775 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 2.782228e-05  max resid 0.0001438783 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 4 stress 0.09250775 </span></span>
+<span><span class="co">#&gt; ... New best solution</span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 1.121683e-05  max resid 5.197604e-05 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 5 stress 0.1235952 </span></span>
+<span><span class="co">#&gt; Run 6 stress 0.1143813 </span></span>
+<span><span class="co">#&gt; Run 7 stress 0.1143813 </span></span>
+<span><span class="co">#&gt; Run 8 stress 0.09250776 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 2.761883e-05  max resid 0.0001426919 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 9 stress 0.1235952 </span></span>
+<span><span class="co">#&gt; Run 10 stress 0.1336866 </span></span>
+<span><span class="co">#&gt; Run 11 stress 0.09250785 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 6.897622e-05  max resid 0.0003784065 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 12 stress 0.09250775 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 1.175285e-05  max resid 5.320298e-05 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 13 stress 0.1235952 </span></span>
+<span><span class="co">#&gt; Run 14 stress 0.1143813 </span></span>
+<span><span class="co">#&gt; Run 15 stress 0.09250777 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 2.920276e-05  max resid 0.0001505327 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 16 stress 0.09250778 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 4.466845e-05  max resid 0.0002437596 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 17 stress 0.09250776 </span></span>
+<span><span class="co">#&gt; ... Procrustes: rmse 3.212737e-05  max resid 0.0001918976 </span></span>
+<span><span class="co">#&gt; ... Similar to previous best</span></span>
+<span><span class="co">#&gt; Run 18 stress 0.1143813 </span></span>
+<span><span class="co">#&gt; Run 19 stress 0.1275485 </span></span>
+<span><span class="co">#&gt; Run 20 stress 0.1143813 </span></span>
+<span><span class="co">#&gt; *** Best solution repeated 7 times</span></span>
+<span><span class="co">#&gt; [1] 0.09250775</span></span></code></pre>
 <p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <p>Sites at either end of the pH gradient are therefore further from the
 centroid (i.e., they present a higher average dissimilarity to all other
@@ -185,7 +228,7 @@ expected dissimilarity between sites a function of their environmental
 distance <span class="citation">(Mokany et al. 2022)</span>. In
 <code>gdmmTMB</code>, these directional effects are introduced via the
 <code>diss_formula</code> argument:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_gdmm3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gdmm.html">gdmm</a></span><span class="op">(</span></span>
 <span>  Y <span class="op">=</span> <span class="va">Y</span>,</span>
 <span>  X <span class="op">=</span> <span class="va">Xenv</span>,</span>
@@ -196,7 +239,7 @@ distance <span class="citation">(Mokany et al. 2022)</span>. In
 <span>  mono <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>diss_gradient</code> function can be used to visualise
 dissimilarity gradients.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diss_grad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/diss_gradient.html">diss_gradient</a></span><span class="op">(</span><span class="va">m_gdmm3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">diss_grad</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">f_x</span><span class="op">)</span><span class="op">)</span>  <span class="op">+</span></span>
@@ -208,7 +251,7 @@ dissimilarity gradients.</p>
 <p>We can also use the <code>predict</code> method to visualise the new
 expected relationship between pH and LCBD, and the contributions of each
 model component (directional and non-directional effects):</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">newdata_mean</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>pH <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Xenv</span><span class="op">$</span><span class="va">pH</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Xenv</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">predict_tot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
