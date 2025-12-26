@@ -108,7 +108,7 @@ term.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">pred_lcbd</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>aspect.ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 <p>In brief, effects on LCBD denote increasing or decreasing expected
 dissimilarity of each community to all other communities. The U-shaped
 relationship therefore indicates that communities at the extremes of the
@@ -137,7 +137,7 @@ This can be done in <code>gdmmTMB</code> via the
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">pred_lcbd</span>, col <span class="op">=</span> <span class="st">'lcbd'</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>aspect.ratio <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>        legend.position <span class="op">=</span> <span class="st">'bottom'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 <p>Both models produce the exact same U-shaped relationship between
 <code>pH</code> and <code>LCBD</code>. However, modelling effects on
 uniqueness with pairwise dissimilarities allows accounting for the
@@ -164,7 +164,7 @@ or with Bayesian bootstrapping (<code>bboot = TRUE</code>):</p>
 <span>  uniq_formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">pH</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">'binomial'</span>,</span>
 <span>  bboot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="accounting-for-directional-community-changes">Accounting for directional community changes<a class="anchor" aria-label="anchor" href="#accounting-for-directional-community-changes"></a>
@@ -174,7 +174,7 @@ sites with low and high pH host relatively more unique species. However,
 a representation of the variability in community composition reveals a
 strong directional change in community composition along the pH
 gradient.</p>
-<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <p>Sites at either end of the pH gradient are therefore further from the
 centroid (i.e., they present a higher average dissimilarity to all other
 sites), which could underpin the U-shaped relationship between LCBD and
@@ -225,7 +225,7 @@ model component (directional and non-directional effects):</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m_gdmm3</span>, new_X <span class="op">=</span> <span class="va">newdata_mean</span>, new_W <span class="op">=</span> <span class="va">Xenv</span>, component <span class="op">=</span> <span class="st">'uniqueness'</span><span class="op">)</span>, </span>
 <span>  pH <span class="op">=</span> <span class="va">Xenv</span><span class="op">$</span><span class="va">pH</span>,</span>
 <span>  LCBD <span class="op">=</span> <span class="va">Xenv</span><span class="op">$</span><span class="va">LCBD</span><span class="op">)</span></span></code></pre></div>
-<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="modelling_community_uniqueness_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
