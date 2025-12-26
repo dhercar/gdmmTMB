@@ -68,14 +68,13 @@
 <h1 id="usage-example">Usage example<a class="anchor" aria-label="anchor" href="#usage-example"></a>
 </h1>
 <p>The package <code>gdmmTMB</code> was designed primarily for the analysis of ecological datasets where a set of environmental variables is used to explain variability in species composition.</p>
-<p>We start with two matrices:</p>
+<p>For this example, we use two datasets available as part of the <code>gdm</code> package. We start with two matrices:</p>
 <ul>
 <li>
 <code>sp</code>: A community matrix (site x species)</li>
 <li>
 <code>env</code>: A matrix of environmental covariates.</li>
 </ul>
-<p>For this example, we use two datasets available as part of the <code>gdm</code> package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dhercar.github.io/gdmmTMB/">gdmmTMB</a></span><span class="op">)</span></span>
@@ -104,7 +103,7 @@
 y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
 </annotation></semantics></math></p>
 <p>where the dissimilarity between observations <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math> depends on the number of unshared (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>i</mi></msub><mo>,</mo><msub><mi>b</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">b_i, b_j</annotation></semantics></math>) and shared (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">a_{ij}</annotation></semantics></math>) species.</p>
-<p>By specifying a binomial distribution, the Jaccard dissimilarity index is modelled as the probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math> that a randomly chosen species from the combined species pool (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>b</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">2a_{ij} + b_i + b_j</annotation></semantics></math>) is not shared between observations <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</p>
+<p>By specifying a binomial distribution, the Jaccard dissimilarity index is modelled as the probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math> that a randomly chosen species from the combined species pool (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>b</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">a_{ij} + b_i + b_j</annotation></semantics></math>) is not shared between observations <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</p>
 <div class="section level3">
 <h3 id="model-summary">Model summary<a class="anchor" aria-label="anchor" href="#model-summary"></a>
 </h3>
@@ -122,16 +121,16 @@ y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="do">## --------------------------------- Coeff. Table --------------------------------- </span></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="do">##                    Estimate  Std.Err.      2.5%       50%     97.5% pseudo-Z</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="do">## diss: isp(bio6)1  3.169e-01 1.453e-01 3.586e-02 3.036e-01 6.294e-01   2.1807</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="do">## diss: isp(bio6)2  1.353e-02 3.924e-02 1.017e-08 1.448e-08 1.475e-01   0.3448</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="do">## diss: isp(bio6)3  1.274e-02 4.265e-02 1.000e-08 1.055e-08 1.547e-01   0.2987</span></span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="do">## diss: isp(bio15)1 8.693e-01 1.232e-01 6.749e-01 8.602e-01 1.111e+00   7.0576</span></span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="do">## diss: isp(bio15)2 1.064e-08 1.627e-09 1.000e-08 1.003e-08 1.398e-08   6.5362</span></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="do">## diss: isp(bio15)3 1.006e-08 1.904e-10 1.000e-08 1.000e-08 1.038e-08  52.8295</span></span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="do">## diss: isp(bio19)1 1.897e+00 1.808e-01 1.571e+00 1.913e+00 2.224e+00  10.4934</span></span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="do">## diss: isp(bio19)2 1.008e-08 1.870e-10 1.000e-08 1.000e-08 1.071e-08  53.9203</span></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="do">## diss: isp(bio19)3 1.004e-08 1.510e-10 1.000e-08 1.000e-08 1.034e-08  66.4852</span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="do">## (Intercept)       8.668e-01 7.342e-02 7.332e-01 8.637e-01 9.932e-01  11.8061</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="do">## diss: isp(bio6)1  3.217e-01 1.355e-01 8.045e-02 3.259e-01 6.025e-01   2.3740</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="do">## diss: isp(bio6)2  1.341e-02 4.014e-02 1.010e-08 1.672e-08 1.598e-01   0.3340</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="do">## diss: isp(bio6)3  1.750e-02 4.444e-02 1.000e-08 1.109e-08 1.448e-01   0.3937</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="do">## diss: isp(bio15)1 8.631e-01 1.443e-01 5.817e-01 8.552e-01 1.143e+00   5.9792</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="do">## diss: isp(bio15)2 1.210e-08 1.360e-08 1.000e-08 1.003e-08 1.341e-08   0.8896</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="do">## diss: isp(bio15)3 1.246e-08 1.990e-08 1.000e-08 1.000e-08 1.253e-08   0.6259</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="do">## diss: isp(bio19)1 1.876e+00 1.440e-01 1.609e+00 1.860e+00 2.143e+00  13.0284</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="do">## diss: isp(bio19)2 1.412e-08 3.178e-08 1.000e-08 1.000e-08 1.240e-08   0.4442</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="do">## diss: isp(bio19)3 1.627e-08 5.185e-08 1.000e-08 1.000e-08 2.131e-08   0.3139</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="do">## (Intercept)       8.789e-01 7.069e-02 7.537e-01 8.739e-01 1.012e+00  12.4331</span></span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="do">##                   pseudo-Pval    </span></span>
 <span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="do">## diss: isp(bio6)1       &lt; 0.01 ***</span></span>
 <span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="do">## diss: isp(bio6)2       &lt; 0.01 ***</span></span>
@@ -151,8 +150,8 @@ y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
 <span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="do">## signif. codes: '***' &lt;0.001 '**' &lt;0.01 '*' &lt;0.05 '.' &lt;0.1 </span></span>
 <span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="do">## ---</span></span>
 <span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="do">## Marginal log-likelihood (average):  -27784.1 </span></span>
-<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="do">## AIC:  55588.2 , AICc:  55588.26 , BIC:  55652.03 </span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="do">## Marginal log-likelihood (average):  -27848.53 </span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="do">## AIC:  55717.06 , AICc:  55717.11 , BIC:  55780.88 </span></span>
 <span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a><span class="do">## --------------------------------------------------------------------------------</span></span></code></pre></div>
 </div>
@@ -179,7 +178,7 @@ y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
 <span>        strip.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        aspect.ratio <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="README_files/figure-gfm/unnamed-chunk-6-1.png"><!-- --></p>
-<p>The plot shows the relationship between each variable (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>) and the same variable after applying the monotonic, non-linear transformation (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math>). Steeper increases in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>X</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(X)</annotation></semantics></math> correspond to fast community change.</p>
+<p>The plot shows the relationship between each variable (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>) and the same variable after applying the monotonic, non-linear transformation (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math>). Steeper increases in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math> correspond to fast community change.</p>
 </div>
 </div>
 

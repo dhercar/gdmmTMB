@@ -14,7 +14,7 @@ Diversity (LCBD), are the response.
 
 This vignette showcases the usage of `gdmmTMB` to model community
 uniqueness using the dataset `microbialdata` available as part of the
-`gllvm` R package. The dataset contains the matrices `Y`, which contains
+`gllvm` R package. The dataset contains the matrices `Y`, with
 abundances of over 900 species found across 56 microbial communities,
 and `Xenv`, which consists of multiple environmental variables measured
 at each site
@@ -54,10 +54,10 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 ![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-3-1.png)
 
 In brief, effects on LCBD denote increasing or decreasing expected
-dissimilarity of each community to all other communities. The U-shaped
-relationship therefore indicates that communities at the extremes of the
-pH gradient are more dissimilar on average to all other communities, and
-therefore more unique.
+dissimilarities of each community to all other communities. The U-shaped
+relationship above therefore indicates that communities at the extremes
+of the pH gradient are more dissimilar on average to all other
+communities, and therefore more unique.
 
 We can obtain the exact same relationship by modelling pairwise
 dissimilarities directly, by introducing site-level effects (see
@@ -90,7 +90,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 Both models produce the exact same U-shaped relationship between `pH`
 and `LCBD`. However, modelling effects on uniqueness with pairwise
 dissimilarities allows accounting for the distribution of such
-dissimilarities with a more appropriate error distribution link
+dissimilarities with a more appropriate error distribution and link
 function. For instance, a binomial error distribution can be specified
 via the `family` argument. We can also account for the non-independence
 of pairwise dissimilarities with a site-level random effect
@@ -126,51 +126,7 @@ representation of the variability in community composition reveals a
 strong directional change in community composition along the pH
 gradient.
 
-    #> Run 0 stress 0.09250775 
-    #> Run 1 stress 0.138292 
-    #> Run 2 stress 0.09250775 
-    #> ... New best solution
-    #> ... Procrustes: rmse 2.049678e-05  max resid 0.0001001463 
-    #> ... Similar to previous best
-    #> Run 3 stress 0.09250775 
-    #> ... Procrustes: rmse 2.782228e-05  max resid 0.0001438783 
-    #> ... Similar to previous best
-    #> Run 4 stress 0.09250775 
-    #> ... New best solution
-    #> ... Procrustes: rmse 1.121683e-05  max resid 5.197604e-05 
-    #> ... Similar to previous best
-    #> Run 5 stress 0.1235952 
-    #> Run 6 stress 0.1143813 
-    #> Run 7 stress 0.1143813 
-    #> Run 8 stress 0.09250776 
-    #> ... Procrustes: rmse 2.761883e-05  max resid 0.0001426919 
-    #> ... Similar to previous best
-    #> Run 9 stress 0.1235952 
-    #> Run 10 stress 0.1336866 
-    #> Run 11 stress 0.09250785 
-    #> ... Procrustes: rmse 6.897622e-05  max resid 0.0003784065 
-    #> ... Similar to previous best
-    #> Run 12 stress 0.09250775 
-    #> ... Procrustes: rmse 1.175285e-05  max resid 5.320298e-05 
-    #> ... Similar to previous best
-    #> Run 13 stress 0.1235952 
-    #> Run 14 stress 0.1143813 
-    #> Run 15 stress 0.09250777 
-    #> ... Procrustes: rmse 2.920276e-05  max resid 0.0001505327 
-    #> ... Similar to previous best
-    #> Run 16 stress 0.09250778 
-    #> ... Procrustes: rmse 4.466845e-05  max resid 0.0002437596 
-    #> ... Similar to previous best
-    #> Run 17 stress 0.09250776 
-    #> ... Procrustes: rmse 3.212737e-05  max resid 0.0001918976 
-    #> ... Similar to previous best
-    #> Run 18 stress 0.1143813 
-    #> Run 19 stress 0.1275485 
-    #> Run 20 stress 0.1143813 
-    #> *** Best solution repeated 7 times
-    #> [1] 0.09250775
-
-![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-7-1.png)
+![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-8-1.png)
 
 Sites at either end of the pH gradient are therefore further from the
 centroid (i.e., they present a higher average dissimilarity to all other
@@ -206,7 +162,7 @@ ggplot(do.call(rbind, diss_grad), aes(x = x, y = f_x))  +
   ylab('f(pH)')
 ```
 
-![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-9-1.png)
+![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-10-1.png)
 
 We can also use the `predict` method to visualise the new expected
 relationship between pH and LCBD, and the contributions of each model
@@ -231,7 +187,7 @@ predict_nondir <- data.frame(
   LCBD = Xenv$LCBD)
 ```
 
-![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-11-1.png)
+![](modelling_community_uniqueness_files/figure-html/unnamed-chunk-12-1.png)
 
 ## References
 

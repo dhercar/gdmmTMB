@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   modelling_community_uniqueness: modelling_community_uniqueness.html
-last_built: 2025-12-26T03:48Z
+last_built: 2025-12-26T20:22Z
 urls:
   reference: https://dhercar.github.io/gdmmTMB/reference
   article: https://dhercar.github.io/gdmmTMB/articles

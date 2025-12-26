@@ -20,13 +20,11 @@ The package `gdmmTMB` was designed primarily for the analysis of
 ecological datasets where a set of environmental variables is used to
 explain variability in species composition.
 
-We start with two matrices:
+For this example, we use two datasets available as part of the `gdm`
+package. We start with two matrices:
 
 - `sp`: A community matrix (site x species)
 - `env`: A matrix of environmental covariates.
-
-For this example, we use two datasets available as part of the `gdm`
-package.
 
 ``` r
 library(tidyverse)
@@ -72,7 +70,7 @@ number of unshared ($b_{i},b_{j}$) and shared ($a_{ij}$) species.
 
 By specifying a binomial distribution, the Jaccard dissimilarity index
 is modelled as the probability $\pi$ that a randomly chosen species from
-the combined species pool ($2a_{ij} + b_{i} + b_{j}$) is not shared
+the combined species pool ($a_{ij} + b_{i} + b_{j}$) is not shared
 between observations $i$ and $j$.
 
 ### Model summary
@@ -98,16 +96,16 @@ summary(m)
 ## --------------------------------- Coeff. Table --------------------------------- 
 ## 
 ##                    Estimate  Std.Err.      2.5%       50%     97.5% pseudo-Z
-## diss: isp(bio6)1  3.169e-01 1.453e-01 3.586e-02 3.036e-01 6.294e-01   2.1807
-## diss: isp(bio6)2  1.353e-02 3.924e-02 1.017e-08 1.448e-08 1.475e-01   0.3448
-## diss: isp(bio6)3  1.274e-02 4.265e-02 1.000e-08 1.055e-08 1.547e-01   0.2987
-## diss: isp(bio15)1 8.693e-01 1.232e-01 6.749e-01 8.602e-01 1.111e+00   7.0576
-## diss: isp(bio15)2 1.064e-08 1.627e-09 1.000e-08 1.003e-08 1.398e-08   6.5362
-## diss: isp(bio15)3 1.006e-08 1.904e-10 1.000e-08 1.000e-08 1.038e-08  52.8295
-## diss: isp(bio19)1 1.897e+00 1.808e-01 1.571e+00 1.913e+00 2.224e+00  10.4934
-## diss: isp(bio19)2 1.008e-08 1.870e-10 1.000e-08 1.000e-08 1.071e-08  53.9203
-## diss: isp(bio19)3 1.004e-08 1.510e-10 1.000e-08 1.000e-08 1.034e-08  66.4852
-## (Intercept)       8.668e-01 7.342e-02 7.332e-01 8.637e-01 9.932e-01  11.8061
+## diss: isp(bio6)1  3.217e-01 1.355e-01 8.045e-02 3.259e-01 6.025e-01   2.3740
+## diss: isp(bio6)2  1.341e-02 4.014e-02 1.010e-08 1.672e-08 1.598e-01   0.3340
+## diss: isp(bio6)3  1.750e-02 4.444e-02 1.000e-08 1.109e-08 1.448e-01   0.3937
+## diss: isp(bio15)1 8.631e-01 1.443e-01 5.817e-01 8.552e-01 1.143e+00   5.9792
+## diss: isp(bio15)2 1.210e-08 1.360e-08 1.000e-08 1.003e-08 1.341e-08   0.8896
+## diss: isp(bio15)3 1.246e-08 1.990e-08 1.000e-08 1.000e-08 1.253e-08   0.6259
+## diss: isp(bio19)1 1.876e+00 1.440e-01 1.609e+00 1.860e+00 2.143e+00  13.0284
+## diss: isp(bio19)2 1.412e-08 3.178e-08 1.000e-08 1.000e-08 1.240e-08   0.4442
+## diss: isp(bio19)3 1.627e-08 5.185e-08 1.000e-08 1.000e-08 2.131e-08   0.3139
+## (Intercept)       8.789e-01 7.069e-02 7.537e-01 8.739e-01 1.012e+00  12.4331
 ##                   pseudo-Pval    
 ## diss: isp(bio6)1       < 0.01 ***
 ## diss: isp(bio6)2       < 0.01 ***
@@ -127,8 +125,8 @@ summary(m)
 ## signif. codes: '***' <0.001 '**' <0.01 '*' <0.05 '.' <0.1 
 ## ---
 ## 
-## Marginal log-likelihood (average):  -27784.1 
-## AIC:  55588.2 , AICc:  55588.26 , BIC:  55652.03 
+## Marginal log-likelihood (average):  -27848.53 
+## AIC:  55717.06 , AICc:  55717.11 , BIC:  55780.88 
 ## 
 ## --------------------------------------------------------------------------------
 ```
@@ -178,5 +176,5 @@ do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
 
 The plot shows the relationship between each variable ($x$) and the same
 variable after applying the monotonic, non-linear transformation
-($f(x)$). Steeper increases in $f(X)$ correspond to fast community
+($f(x)$). Steeper increases in $f(x)$ correspond to fast community
 change.
