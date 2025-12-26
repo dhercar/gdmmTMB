@@ -33,7 +33,8 @@ Suggests:
     gdm,
     gllvm,
     ggplot2,
-    tidyverse
+    tidyverse,
+    adepsatial
 Config/testthat/edition: 3
 URL: https://dhercar.github.io/gdmmTMB/
 VignetteBuilder: knitr
