@@ -34,4 +34,4 @@ sum to 1.
 
 ## See also
 
-`LCBD.comp`
+[`LCBD.comp`](http://adeverse.github.io/adespatial/reference/LCBD.comp.md)
