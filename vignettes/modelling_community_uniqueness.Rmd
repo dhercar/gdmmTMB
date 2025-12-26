@@ -123,7 +123,7 @@ ggplot(Xenv , aes(x = pH, y = LCBD)) +
 The U-shaped relationship between LCBD and pH above indicates that sites with low and high pH host relatively more unique species. However, a representation of the variability in community composition reveals a strong directional change in community composition along the pH gradient. 
 
 
-```{r, echo = F, message = F, warning = F, error = F, results = 'hide'}
+```{r, echo = F, message = F, warning = F, error = F}
 
 sp_dist <- as.matrix(vegan::vegdist(Y))
 
