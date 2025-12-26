@@ -29,7 +29,11 @@ LinkingTo:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    gdm,
+    gllvm,
+    ggplot2,
+    tidyverse
 Config/testthat/edition: 3
 URL: https://dhercar.github.io/gdmmTMB/
 VignetteBuilder: knitr
