@@ -27,6 +27,15 @@ LinkingTo:
     RcppEigen,
     TMB
 Suggests: 
-    testthat (>= 3.0.0)
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    gdm,
+    gllvm,
+    ggplot2,
+    tidyverse,
+    adespatial,
+    cowplot
 Config/testthat/edition: 3
 URL: https://dhercar.github.io/gdmmTMB/
+VignetteBuilder: knitr

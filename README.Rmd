@@ -10,60 +10,63 @@ output: github_document
 The package `gdmmTMB` provides functions for fitting and interrogating Generalised Dissimilarity Mixed Models (GDMM) using maximum likelihood estimation, Laplace approximation and (optionally) Bayesian Bootstrapping.
 
 # Installation
+
+The package can be installed from GitHub using `devtools::install_github`:
+
 ```{r, eval = FALSE}
 devtools::install_github('dhercar/gdmmTMB')
 ```
 
-# Example
-We start with two matrices: A community matrix (site x species) and a matrix of environmental covariates. 
+# Usage example
+
+The package `gdmmTMB` was designed primarily for the analysis of ecological datasets where a set of environmental variables is used to explain variability in species composition. 
+
+For this example, we use two datasets available as part of the `gdm` package. We start with two matrices: 
+
+- `sp`: A community matrix (site x species) 
+- `env`: A matrix of environmental covariates. 
+
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(gdmmTMB)
 
-# Community matrix
 sp <- gdm::southwest %>% select(site, species) %>% 
   group_by(site, species) %>%
   summarise(n = 1) %>%
-  pivot_wider(id_cols = site, names_from = species,values_from = n, values_fill = 0 ) %>%
+  pivot_wider(id_cols = site, names_from = species,values_from = n, values_fill = 0) %>%
   arrange(site)
-```
 
-
-```{r, message=FALSE, warning=FALSE, echo = FALSE}
-kableExtra::kable(head(sp))
-```
-
-
-```{r, message=FALSE, warning=FALSE}
 env <- gdm::southwest %>% select(-c(species)) %>%
   distinct() %>% arrange(site)
 ```
 
 
-```{r, message=FALSE, warning=FALSE, echo = FALSE}
-kableExtra::kable(head(env))
-```
-
-
-### Fitting model 
-
-In this example, we specify a binomial distribution and estimate model parameters with a Bayesian bootstrapping approach. Monotonic I-splines for dissimilarity gradients (`diss_formula`) are specified via `isp(x)` and `mono = TRUE`.
+We use `bio6`, `bio15`, and `bio19` as explanatory variables. Monotonic I-splines for dissimilarity gradients (`diss_formula`) are specified via `isp(x)` and `mono = TRUE`. The resulting non-linear transformations reflect the degree of directional community change along each environmental gradient. 
 
 ```{r}
 m <- gdmm(Y = sp[,-1],
           X = env,
-          diss_formula = ~ 
-            isp(bio6)  +
-            isp(bio15) + 
-            isp(bio19),
+          diss_formula = ~ isp(bio6) + isp(bio15) + isp(bio19),
           family = 'binomial',
+          method = 'jaccard',
           n_boot = 100, # should be at least 1000
           bboot = TRUE,
           mono = TRUE)
 ```
 
+We specify a `binomial` error family to model Jaccard dissimilarities,
+
+$$
+y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
+$$
+
+where the dissimilarity between observations $i$ and $j$ depends on the number of unshared ($b_i, b_j$) and shared ($a_{ij}$) species. 
+
+By specifying a binomial distribution, the Jaccard dissimilarity index is modelled as the probability $\pi$ that a randomly chosen species from the combined species pool ($a_{ij} + b_i + b_j$) is not shared between observations $i$ and $j$. 
 
 ### Model summary
+
+The `summary` method in `gdmmTMB` provides general information about the model, including estimated coefficients, credible or confidence intervals, and common metrics used for model selection such as AIC and BIC. 
 
 ```{r}
 summary(m)
@@ -71,10 +74,17 @@ summary(m)
 
 
 ### Plot dissimilarity gradients 
+
+Predictors in 'diss_formula' are treated as environmental distances, and their contribution to the expected dissimilarity depends on the distance between samples after (optionally) transformations are applied. For instance, `isp(bio6)` with `mono = TRUE` defines a non-linear, monotonic change in community composition that generates increasing dissimilarities with increasing distance along the gradient (dissimilarity gradient).The shape of the resulting function can be informative of the degree of directional community change that each environmental variable is responsible for. 
+
+The function `diss_gradient` provides a list of dissimilarity gradients and their confidence or credible intervals, which can be easily combined and plotted:
+
 ```{r, message=FALSE}
 f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
+
 ```
 
+Note that the argument `CI_quant` specifies the coverage of the confidence or credible interval, not the quantiles themselves (e.g., 0.95 implies quantiles of 0.025 and 0.975). We have therefore specified 50% and 95% credible credible intervals. 
 
 ```{r}
 library(ggplot2)
@@ -86,9 +96,11 @@ do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
   geom_ribbon(aes(x = x, ymax = `CI 25%`, ymin = `CI 75%`), alpha = 0.3) +
   facet_wrap(~var, scales = 'free_x', strip.position = "bottom") +
   ylab('f(x)') +
-  theme(legend.position = '',
-        strip.placement = 'outside', 
+  theme(strip.placement = 'outside', 
+        panel.grid = element_blank(),
         strip.background = element_blank(),
         aspect.ratio = 1)
 ```
+
+The plot shows the relationship between each variable ($x$) and the same variable after applying the monotonic, non-linear transformation ($f(x)$). Steeper increases in $f(x)$ correspond to fast community change. 
 
