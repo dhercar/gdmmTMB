@@ -25,4 +25,3 @@ normalized to sum to 1.
 \seealso{
 \code{\link[adespatial]{LCBD.comp}}
 }
-\keyword{internal}

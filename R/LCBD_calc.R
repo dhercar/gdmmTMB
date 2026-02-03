@@ -15,7 +15,7 @@
 #'
 #' @seealso \code{\link[adespatial]{LCBD.comp}}
 #'
-#' @keywords internal
+#' @export
 SS_calc <- function(x, LCBD = FALSE){
   stopifnot(is.matrix(x), isSymmetric(x))
 
