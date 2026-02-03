@@ -7,14 +7,14 @@
 
 ## Citation
 
-Hernandez-Carrasco D (2025). *gdmmTMB: Generalised Dissimilarity Mixed
+Hernandez-Carrasco D (2026). *gdmmTMB: Generalised Dissimilarity Mixed
 Models in R Using TMB*. R package version 0.0.0.9000,
 <https://dhercar.github.io/gdmmTMB/>.
 
     @Manual{,
       title = {gdmmTMB: Generalised Dissimilarity Mixed Models in R Using TMB},
       author = {Daniel Hernandez-Carrasco},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.0.0.9000},
       url = {https://dhercar.github.io/gdmmTMB/},
     }

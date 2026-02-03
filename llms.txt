@@ -187,6 +187,8 @@ change.
   Calculate AICc
 - [`BIC2()`](https://dhercar.github.io/gdmmTMB/reference/BIC2.md) :
   Bayesian Information Criterion (BIC)
+- [`SS_calc()`](https://dhercar.github.io/gdmmTMB/reference/SS_calc.md)
+  : Compute Sum of Squares or LCBD from a Symmetric Dissimilarity Matrix
 - [`bray1()`](https://dhercar.github.io/gdmmTMB/reference/bray1.md) :
   Bray-Curtis dissimilarity components
 - [`diss_gradient()`](https://dhercar.github.io/gdmmTMB/reference/diss_gradient.md)
