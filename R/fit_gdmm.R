@@ -74,7 +74,7 @@ gdmm <- function(Y = NULL,
                  n_cores = NULL) {
 
   #### Checks ####
-    if (!is.null(pair_formula) && is.null(X_pair)) {
+  if (!is.null(pair_formula) && is.null(X_pair)) {
     stop("You supplied 'pair_formula' but no 'X_pair'. Please supply a pairwise data.frame/matrix aligned to D/Y_diss, or remove 'pair_formula'.")
   }
 
@@ -138,6 +138,14 @@ gdmm <- function(Y = NULL,
     stop(paste("'family' must be one of:", paste(valid_link, collapse = ", ")))
   }
 
+  if (link == 'neg_exp' && !is.null(uniq_formula)) {
+    stop("Site-level (non-directional) effects are not available with link = 'neg_exp'.\n",
+         "  Terms in 'uniq_formula', including site-level random effects, are free in sign ",
+         "and can make the linear predictor negative, which gives negative expected ",
+         "dissimilarities under mu = 1 - exp(-eta).\n",
+         "  Use link = 'logit', or drop 'uniq_formula' to fit directional effects only.")
+  }
+
   # Numeric codes for fam and link
   family_num <- switch(family,
                        'normal' = 0,
@@ -154,11 +162,11 @@ gdmm <- function(Y = NULL,
 
   # 1. Diss. model matrix (pair)
   if (!is.null(pair_formula) & !is.null(X_pair)) {
-  form_X_pair <- hardhat::mold(pair_formula,
-                          X_pair,
-                          blueprint = default_formula_blueprint(intercept = FALSE))
+    form_X_pair <- hardhat::mold(pair_formula,
+                                 X_pair,
+                                 blueprint = default_formula_blueprint(intercept = FALSE))
   } else {
-  form_X_pair <- list(predictors =  matrix(ncol = 0, nrow = 0))
+    form_X_pair <- list(predictors =  matrix(ncol = 0, nrow = 0))
   }
 
   # 2. Diss. model matrix (site)
@@ -192,7 +200,7 @@ gdmm <- function(Y = NULL,
   map = list()
   if (length(re_vars) > 0) {
     Z_design <- Matrix::sparse.model.matrix(eval(parse(text = paste0('~ 0 + ', paste0(re_vars, collapse = ' + ')))),
-                             data = X)
+                                            data = X)
     has_re = 1
     map_re <- as.numeric(as.factor(unlist(lapply(re_vars, function(x) rep(x, length(unique(X[[x]])))))))
 
@@ -245,7 +253,7 @@ gdmm <- function(Y = NULL,
     family = family_num)
 
   parameters <- list(
-    intercept = 0,
+    intercept_raw = 0,
     beta = rep(0, ncol(form_X$predictors)),
     beta_p = rep(0, ncol(form_X_pair$predictors)),
     lambda = rep(0, ncol(form_W$predictors)),
@@ -294,36 +302,36 @@ gdmm <- function(Y = NULL,
       upper = upper_bounds,
       control = control_def)
 
-      print(opt$message)
+    print(opt$message)
 
-      fit <- list(Y = Y,
-                  Y_diss = Y_diss,
-                  Y_den = Y_den,
-                  X = X,
-                  X_pair = X_pair,
-                  D = D,
-                  form_X = form_X,
-                  form_W = form_W,
-                  form_X_pair = form_X_pair,
-                  Z_design = Z_design,
-                  map_re = map_re,
-                  re_vars = re_vars,
-                  diss_formula = diss_formula,
-                  uniq_formula = uniq_formula,
-                  pair_formula = pair_formula,
-                  link = link,
-                  family = family,
-                  obj = obj,
-                  opt = opt,
-                  boot = FALSE,
-                  mono = mono,
-                  mono_pair = mono_pair,
-                  call = match.call())
+    fit <- list(Y = Y,
+                Y_diss = Y_diss,
+                Y_den = Y_den,
+                X = X,
+                X_pair = X_pair,
+                D = D,
+                form_X = form_X,
+                form_W = form_W,
+                form_X_pair = form_X_pair,
+                Z_design = Z_design,
+                map_re = map_re,
+                re_vars = re_vars,
+                diss_formula = diss_formula,
+                uniq_formula = uniq_formula,
+                pair_formula = pair_formula,
+                link = link,
+                family = family,
+                obj = obj,
+                opt = opt,
+                boot = FALSE,
+                mono = mono,
+                mono_pair = mono_pair,
+                call = match.call())
 
-      out <- new_gdmm(fit)
-      return(out)
+    out <- new_gdmm(fit)
+    return(out)
 
-  #### BAYESIAN BOOTSTRAPPING ####
+    #### BAYESIAN BOOTSTRAPPING ####
   } else if (bboot == TRUE) {
     if (is.null(n_cores))  n_cores = max(parallel::detectCores(logical = TRUE) - 2, 1)
 
@@ -336,39 +344,39 @@ gdmm <- function(Y = NULL,
 
     results <- foreach(i = 1:n_boot, .combine = rbind,
                        .packages = c('TMB', 'gtools')) %dopar% {
-      # calculate random weights
-      n <- length(unique(c(D[,1], D[,2])))
-      weights_sample <-  c(gtools::rdirichlet(1,rep(1,n)))
-      weights_pair <- (weights_sample[D[,1]] * weights_sample[D[,2]])
-      data[['weights']] <- weights_pair/sum(weights_pair)*length(Y_diss) # standardise weights
-      # objective
-      obj <- MakeADFun(
-        data = data,
-        parameters = parameters,
-        DLL = 'gdmmTMB',
-        map = map,
-        random = 'u',
-        silent = !trace
-      )
+                         # calculate random weights
+                         n <- length(unique(c(D[,1], D[,2])))
+                         weights_sample <-  c(gtools::rdirichlet(1,rep(1,n)))
+                         weights_pair <- (weights_sample[D[,1]] * weights_sample[D[,2]])
+                         data[['weights']] <- weights_pair/sum(weights_pair)*length(Y_diss) # standardise weights
+                         # objective
+                         obj <- MakeADFun(
+                           data = data,
+                           parameters = parameters,
+                           DLL = 'gdmmTMB',
+                           map = map,
+                           random = 'u',
+                           silent = !trace
+                         )
 
-      n_par <- length(obj$par)
-      lower_bounds <- rep(-Inf, n_par)
-      upper_bounds <- rep( Inf, n_par)
+                         n_par <- length(obj$par)
+                         lower_bounds <- rep(-Inf, n_par)
+                         upper_bounds <- rep( Inf, n_par)
 
-      if (mono) {
-        # lower_bounds[names(obj$par) == 'beta'] <- 0
-      }
+                         if (mono) {
+                           # lower_bounds[names(obj$par) == 'beta'] <- 0
+                         }
 
-      opt <- nlminb(
-        start = obj$par,
-        objective = obj$fn,
-        gradient = obj$gr,
-        lower = lower_bounds,
-        upper = upper_bounds,
-        control = control_def)
+                         opt <- nlminb(
+                           start = obj$par,
+                           objective = obj$fn,
+                           gradient = obj$gr,
+                           lower = lower_bounds,
+                           upper = upper_bounds,
+                           control = control_def)
 
-      c(sdreport(obj)$value, u_re_ = obj$report()$u_0, obj$report()$sigma_re, logLikelihood = -opt$objective)
-    }
+                         c(sdreport(obj)$value, u_re_ = obj$report()$u_0, obj$report()$sigma_re, logLikelihood = -opt$objective)
+                       }
 
     cat('done\n')
     fit <- list(Y = Y,
@@ -495,6 +503,3 @@ print.bbgdmm <- function(x, ...){
   cat('\n')
   print_title2('', symb = '-')
 }
-
-
-

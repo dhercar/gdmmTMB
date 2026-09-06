@@ -20,7 +20,7 @@ Type objective_function<Type>::operator() ()
   DATA_IVECTOR(map_re);                    // Mapping RE columns
 
   // Parameters
-  PARAMETER(intercept);                    // Intercept
+  PARAMETER(intercept_raw);                // Intercept (unconstrained scale)
   PARAMETER_VECTOR(beta);                  // Slopes diss. grad (X)
   PARAMETER_VECTOR(beta_p);                // Slopes diss. grad (X_pair)
   PARAMETER_VECTOR(lambda);                // Slopes uniq.(W)
@@ -33,6 +33,15 @@ Type objective_function<Type>::operator() ()
   int n_X = X.cols();
   int n_Xp = X_pair.cols();
   int n_W = W.cols();
+
+  Type intercept = intercept_raw;
+  if (link == 2) {
+    // Softplus, log(1 + exp(x)): strictly positive, capped.
+    Type raw_capped = CppAD::CondExpGt(intercept_raw, Type(30), Type(30), intercept_raw);
+    intercept = CppAD::CondExpGt(intercept_raw, Type(30),
+                                 intercept_raw,
+                                 log(Type(1) + exp(raw_capped)));
+  }
 
   vector<Type> e_beta = beta;
   // Exp beta
@@ -138,7 +147,7 @@ Type objective_function<Type>::operator() ()
 
   else if (family == 1) {  // Binomial
     for (int i = 0; i < n_pairs; i++) {
-     nll -= weights(i)*dbinom(Y(i), Y_den(i), mu(i), true);
+      nll -= weights(i)*dbinom(Y(i), Y_den(i), mu(i), true);
     }
   }
 
@@ -166,6 +175,3 @@ Type objective_function<Type>::operator() ()
   REPORT(sigma_re);
   return nll;
 }
-
-
-
