@@ -36,7 +36,7 @@ Type objective_function<Type>::operator() ()
 
   Type intercept = intercept_raw;
   if (link == 2) {
-    // Softplus, log(1 + exp(x)): strictly positive, capped.
+    // Softplus, log(1 + exp(x))
     Type raw_capped = CppAD::CondExpGt(intercept_raw, Type(30), Type(30), intercept_raw);
     intercept = CppAD::CondExpGt(intercept_raw, Type(30),
                                  intercept_raw,
@@ -137,9 +137,20 @@ Type objective_function<Type>::operator() ()
     mu = Type(1) - exp(-(eta*eta));
   }
 
+  // Keep mu strictly inside (0, 1) this only
+  // changes behaviour in the extreme tail for families 1 and 2.
+  if (family == 1 || family == 2 || family == 3) {
+    for (int i = 0; i < n_pairs; i++) {
+      if (mu(i) < Type(1e-14)) mu(i) = Type(1e-14);
+      if (mu(i) > Type(1.0 - 1e-14)) mu(i) = Type(1.0 - 1e-14);
+    }
+  }
+
+  // Dispersion parameter
+  Type scale = exp(log_scale) + Type(1e-8);
+
   // family nll
   if (family == 0) {  // Gaussian
-    Type scale = exp(log_scale) + Type(1e-8);
     for (int i = 0; i < n_pairs; i++) {
       nll -= weights(i)*dnorm(Y(i), mu(i), scale, true);
     }
@@ -152,7 +163,6 @@ Type objective_function<Type>::operator() ()
   }
 
   else if (family == 2) {  // Beta
-    Type scale = exp(log_scale) + Type(1e-8);
     // reparam. alpha beta into mu phi (scale)
     vector<Type> a = mu * scale;
     vector<Type> b = (Type(1) - mu) * scale;
@@ -162,10 +172,26 @@ Type objective_function<Type>::operator() ()
     }
   }
 
+  else if (family == 3) {  // Beta-binomial
+    for (int i = 0; i < n_pairs; i++) {
+      Type a = mu(i) * scale;
+      Type b = (Type(1) - mu(i)) * scale;
+      Type ll = lgamma(Y_den(i) + Type(1))
+        - lgamma(Y(i) + Type(1))
+        - lgamma(Y_den(i) - Y(i) + Type(1))
+        + lgamma(Y(i) + a)
+        + lgamma(Y_den(i) - Y(i) + b)
+        - lgamma(Y_den(i) + a + b)
+        - lgamma(a) - lgamma(b) + lgamma(a + b);
+        nll -= weights(i) * ll;
+    }
+  }
+
   ADREPORT(e_beta);
   ADREPORT(e_beta_p);
   ADREPORT(lambda);
   ADREPORT(intercept);
+  if (family != 1) ADREPORT(scale);
 
   REPORT(u);
   REPORT(e_beta);
@@ -173,5 +199,6 @@ Type objective_function<Type>::operator() ()
   REPORT(lambda);
   REPORT(intercept);
   REPORT(sigma_re);
+  if (family != 1) REPORT(scale);
   return nll;
 }

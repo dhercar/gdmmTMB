@@ -11,8 +11,8 @@
 #' @param pair_formula Formula specifying predictors for dissimilarity gradients. Variables must be numeric.
 #' @param mono Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `diss_formula`. Default is `FALSE`.
 #' @param mono_pair Logical. If `TRUE`, enforces monotonic (non-decreasing) dissimilarity effects on predictors included in `pair_formula`. Default is `FALSE`.
-#' @param family Distribution family for the response. One of `"normal"`, `"binomial"`, or `"beta"`. Default is `"normal"`.
-#' @param link Link function. If `NULL` (default), automatically chosen based on family: `"identity"` for normal, `"logit"` for binomial/beta.
+#' @param family Distribution family for the response. One of `"normal"`, `"binomial"`, `"beta"`, or `"beta.binomial"`. Default is `"normal"`.
+#' @param link Link function. If `NULL` (default), automatically chosen based on family: `"identity"` for normal, `"logit"` for binomial/beta/beta.binomial.
 #' @param scale_diss Numeric vector of length 2 specifying the range of the re-scaling of dissimilarity values. Useful when using a beta distribution if some dissimilarities are exactly 0 and/or 1.
 #' @param binary Logical. Whether to treat response as binary data before calculating dissimilarities from Y. Default is `FALSE`.
 #' @param method Dissimilarity method applied to Y. See [`vegan::vegdist()`](https://rdrr.io/cran/vegan/man/vegdist.html) for a list of compatible methods. Default is `"bray"`.
@@ -79,8 +79,9 @@ gdmm <- function(Y = NULL,
   }
 
   # Y_den present if needed
-  if (!is.null(Y_diss) && family == "binomial" && (is.null(Y_den) || Y_den == 0)) {
-    stop("When using 'Y_diss' with binomial family, 'Y_den' must be provided")
+  if (!is.null(Y_diss) && family %in% c("binomial", "beta.binomial") &&
+      (is.null(Y_den) || all(Y_den == 0))) {
+    stop("When using 'Y_diss' with a binomial or beta-binomial family, 'Y_den' must be provided")
   }
 
   # Check Y format
@@ -95,14 +96,15 @@ gdmm <- function(Y = NULL,
   }
 
   # Check family
-  valid_families <- c("normal", "binomial", "beta")
+  valid_families <- c("normal", "binomial", "beta", "beta.binomial")
   if (!family %in% valid_families) {
     stop(paste("'family' must be one of:", paste(valid_families, collapse = ", ")))
   }
 
   # Check correct method for binomial
-  if (family == "binomial" && !method %in% c("bray", "sorensen", "jaccard")) {
-    stop("Binomial family only valid with 'bray', 'sorensen', or 'jaccard' methods")
+  if (family %in% c("binomial", "beta.binomial") &&
+      !method %in% c("bray", "sorensen", "jaccard")) {
+    stop("Binomial and beta-binomial families are only valid with 'bray', 'sorensen', or 'jaccard' methods")
   }
 
   # Check numeric variables
@@ -129,7 +131,8 @@ gdmm <- function(Y = NULL,
     link <- switch(family,
                    'normal' = 'identity',
                    'binomial' = 'logit',
-                   'beta' = 'logit')
+                   'beta' = 'logit',
+                   'beta.binomial' = 'logit')
   }
 
   # Check link
@@ -150,7 +153,8 @@ gdmm <- function(Y = NULL,
   family_num <- switch(family,
                        'normal' = 0,
                        'binomial' = 1,
-                       'beta' = 2)
+                       'beta' = 2,
+                       'beta.binomial' = 3)
 
   link_num <- switch(link,
                      'identity' = 0,
@@ -217,12 +221,11 @@ gdmm <- function(Y = NULL,
 
   # 5. Response
   if (is.null(Y_diss)) {
-    if (family %in% c('binomial')) {
+    if (family %in% c('binomial', 'beta.binomial')) {
       Y_pair <- make_y_df(com = Y, D = D, method = method, binary = binary, num_den = TRUE)
       Y_diss <- Y_pair[,3]
       Y_den <- Y_pair[,4]
       D <- Y_pair[,1:2]
-      map = list(log_scale = factor(NA))
 
     } else {
       Y_pair <- make_y_df(com = Y, D = D, method = method, binary = binary, num_den = FALSE)
@@ -231,6 +234,8 @@ gdmm <- function(Y = NULL,
       D <- Y_pair[,1:2]
     }
   }
+
+  if (family == 'binomial') map$log_scale <- factor(NA)
 
   if(!is.null(scale_diss)){
     Y_diss <- scale_dist(Y_diss, scale_diss)
@@ -259,7 +264,7 @@ gdmm <- function(Y = NULL,
     lambda = rep(0, ncol(form_W$predictors)),
     log_sigma_re = rep(0, length(re_vars)),
     u = rep(0, ncol(Z_design)*has_re),
-    log_scale = 0)
+    log_scale = if (family == 'beta.binomial') log(max(stats::median(Y_den), 1)) else 0)
 
   control_def <- list(rel.tol = 1e-10,
                       eval.max = 1000,

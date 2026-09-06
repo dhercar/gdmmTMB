@@ -9,44 +9,44 @@
 #' @export
 summary.gdmm <- function(object, ...) {
 
-    # Get coefficient table with p-values
-    sdr <- TMB::sdreport(object$obj)
-    coef_table <- TMB::summary.sdreport(sdr, select = c('report'), p.value = TRUE)
+  # Get coefficient table with p-values
+  sdr <- TMB::sdreport(object$obj)
+  coef_table <- TMB::summary.sdreport(sdr, select = c('report'), p.value = TRUE)
 
-    # Add significance stars
-    p_values <- coef_table[, "Pr(>|z^2|)"]
-    sig_stars <- ifelse(p_values < 0.001, "***",
-                        ifelse(p_values < 0.01, "**",
-                               ifelse(p_values < 0.05, "*",
-                                      ifelse(p_values < 0.1, ".", " "))))
+  # Add significance stars
+  p_values <- coef_table[, "Pr(>|z^2|)"]
+  sig_stars <- ifelse(p_values < 0.001, "***",
+                      ifelse(p_values < 0.01, "**",
+                             ifelse(p_values < 0.05, "*",
+                                    ifelse(p_values < 0.1, ".", " "))))
 
-    # Create data.frame with lm-style column names and add significance stars
-    result <- as.data.frame(coef_table)
+  # Create data.frame with lm-style column names and add significance stars
+  result <- as.data.frame(coef_table)
 
 
-    # Calculate AIC
-    m_AIC <- AICc(log_likelihood = -object$opt$objective,
-                  n = length(object$Y_diss),
-                  k = length(object$opt$par))
-    m_BIC <- BIC2(log_likelihood = -object$opt$objective,
-                  n = length(object$Y_diss),
-                  k = length(object$opt$par))
+  # Calculate AIC
+  m_AIC <- AICc(log_likelihood = -object$opt$objective,
+                n = length(object$Y_diss),
+                k = length(object$opt$par))
+  m_BIC <- BIC2(log_likelihood = -object$opt$objective,
+                n = length(object$Y_diss),
+                k = length(object$opt$par))
 
-    out <- list(call = object$call,
-                mono = object$mono,
-                mono_pair = object$mono_pair,
-                table = coef_table,
-                p_values = p_values,
-                names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
-                names_beta_p = paste0('diss(p): ', colnames(object$form_X_pair$predictors)),
-                names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
-                sig = sig_stars,
-                AIC = m_AIC$AIC,
-                AICc = m_AIC$AICc,
-                BIC = m_BIC,
-                logL = -object$opt$objective)
-    class(out) <- 'summary.gdmm'
-    return(out)
+  out <- list(call = object$call,
+              mono = object$mono,
+              mono_pair = object$mono_pair,
+              table = coef_table,
+              p_values = p_values,
+              names_beta =  paste0('diss: ', colnames(object$form_X$predictors)),
+              names_beta_p = paste0('diss(p): ', colnames(object$form_X_pair$predictors)),
+              names_lambda =  paste0('uniq: ', colnames(object$form_W$predictors)),
+              sig = sig_stars,
+              AIC = m_AIC$AIC,
+              AICc = m_AIC$AICc,
+              BIC = m_BIC,
+              logL = -object$opt$objective)
+  class(out) <- 'summary.gdmm'
+  return(out)
 }
 
 #' Summary method for bbgdmm objects
@@ -63,8 +63,8 @@ summary.gdmm <- function(object, ...) {
 #' @importFrom stats sd
 #' @export
 summary.bbgdmm <- function(object,
-                         quantiles = c(0.025, 0.5, 0.975),
-                         null_value = 0, ...) {
+                           quantiles = c(0.025, 0.5, 0.975),
+                           null_value = 0, ...) {
 
   # Basic statistics
   samples <- object$boot_samples[, (colnames(object$boot_samples) != 'logLikelihood') & (substr(colnames(object$boot_samples), 1,5) != 'u_re_')]
@@ -204,4 +204,3 @@ print.summary.bbgdmm <- function(x, ...) {
   cat('\n')
   print_title2('', symb = '-')
 }
-
