@@ -110,7 +110,7 @@ predict.gdmm <- function(object,
     u <- object$obj$report()$u
     sigma <- object$obj$report()$sigma_re[object$re_vars %in% re_sd]
   } else if (inherits(object, 'bbgdmm')) {
-    mean_par <- colMeans(object$boot_samples[,colnames(object$boot_samples) %in% c('intercept', 'e_beta', 'lambda', 'u', 'sigma_re')])
+    mean_par <- colMeans(object$boot_samples[,colnames(object$boot_samples) %in% c('intercept', 'e_beta', 'e_beta_p', 'lambda', 'u', 'sigma_re')])
     beta <- mean_par[names(mean_par) == 'e_beta']
     beta_p <-mean_par[names(mean_par) == 'e_beta_p']
     lambda <- mean_par[names(mean_par) == 'lambda']
@@ -160,26 +160,29 @@ predict.gdmm <- function(object,
       u_i <- u #sims[i, colnames(sims) == 'u']
 
       pred_list[[length(pred_list)+1]] <- coef_to_pred(object = object,
-                                intercept = intercept_i,
-                                beta = beta_i,
-                                beta_p = beta_p_i,
-                                lambda = lambda_i,
-                                sigma = sigma,
-                                u = u_i,
-                                n = n,
-                                new_re = new_re,
-                                new_X = new_X,
-                                new_X_pair = new_X_pair,
-                                D = D,
-                                new_W = new_W,
-                                type = type,
-                                scale_uniq = scale_uniq,
-                                component = component)
+                                                       intercept = intercept_i,
+                                                       beta = beta_i,
+                                                       beta_p = beta_p_i,
+                                                       lambda = lambda_i,
+                                                       sigma = sigma,
+                                                       u = u_i,
+                                                       n = n,
+                                                       new_re = new_re,
+                                                       new_X = new_X,
+                                                       new_X_pair = new_X_pair,
+                                                       D = D,
+                                                       new_W = new_W,
+                                                       type = type,
+                                                       scale_uniq = scale_uniq,
+                                                       component = component)
     }
+    pred_mat <- do.call(cbind, pred_list)
     quantiles <- sort(c((1-CI_quant)*0.5, CI_quant + (1-CI_quant)*0.5))
-    CI <- t(apply(do.call(cbind, pred_list), 1, function(x) stats::quantile(x, quantiles)))
-    out <- cbind(mean = out, CI = CI)
-    colnames(out) <- c('mean', paste0('CI ', colnames(CI)))
+    CI <- t(apply(pred_mat, 1, function(x) stats::quantile(x, quantiles)))
+    out <- cbind(mean   = rowMeans(pred_mat),
+                 median = apply(pred_mat, 1, stats::median),
+                 CI     = CI)
+    colnames(out) <- c('mean', 'median', paste0('CI ', colnames(CI)))
   }
   return(out)
 }
@@ -287,6 +290,3 @@ coef_to_pred <- function(object, intercept, beta, beta_p, lambda, u,
     return(pred_diss)
   }
 }
-
-
-

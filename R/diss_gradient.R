@@ -103,6 +103,7 @@ diss_gradient <- function(m,
 
       CI_i <- t(apply(samples, 1, function(x){stats::quantile(x, probs = quantiles)}))
       colnames(CI_i) <- c(paste0('CI ', colnames(CI_i)))
+      out_i$f_x <- apply(samples, 1, stats::median)
 
       out_i <- cbind(out_i, CI_i)
     }
@@ -111,9 +112,3 @@ diss_gradient <- function(m,
 
   return(out_list)
 }
-
-
-
-
-
-
