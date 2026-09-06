@@ -1,6 +1,7 @@
 # Modelling community uniqueness with \`gdmmTMB\`
 
 ``` r
+
 library(gdmmTMB)
 library(ggplot2)
 theme_set(theme_bw(base_size = 8))
@@ -20,6 +21,7 @@ and `Xenv`, which consists of multiple environmental variables measured
 at each site
 
 ``` r
+
 Xenv <- gllvm::microbialdata$Xenv
 Y <- gllvm::microbialdata$Y
 ```
@@ -38,6 +40,7 @@ The code below computes LCBD scores using the package `adespatial` (Dray
 et al. 2018), and regresses them against pH and the quadratic pH term.
 
 ``` r
+
 
 LCBD <- adespatial::LCBD.comp(vegan::vegdist(Y))
 Xenv$LCBD <- LCBD$LCBD
@@ -65,13 +68,14 @@ Hernández-Carrasco et al. (2025) for details). This can be done in
 `gdmmTMB` via the `uniq_formula` argument:
 
 ``` r
+
 # fit model
 m_gdmm <-
   gdmm(Y = Y,
        X = Xenv,
        uniq_formula = ~ poly(pH, 2))
-#> Warning: the 'nobars' function has moved to the reformulas package. Please update your imports, or ask an upstream package maintainter to do so.
-#> This warning is displayed once per session.
+#> Warning: the 'nobars' function has moved to the reformulas package. Please
+#> update your imports, or ask an upstream package maintainer to do so.
 
 # generate predictions
 Xenv$pred_gdmm <- predict(m_gdmm, component = 'uniqueness', scale_uniq = TRUE, CI = F)
@@ -98,6 +102,7 @@ of pairwise dissimilarities with a site-level random effect
 (`bboot = TRUE`):
 
 ``` r
+
 Xenv$site <- as.factor(1:nrow(Xenv))
 
 # site-level random effect
@@ -139,6 +144,7 @@ distance (Mokany et al. 2022). In `gdmmTMB`, these directional effects
 are introduced via the `diss_formula` argument:
 
 ``` r
+
 m_gdmm3 <- gdmm(
   Y = Y,
   X = Xenv,
@@ -153,6 +159,7 @@ The `diss_gradient` function can be used to visualise dissimilarity
 gradients.
 
 ``` r
+
 diss_grad <- diss_gradient(m_gdmm3)
 
 ggplot(do.call(rbind, diss_grad), aes(x = x, y = f_x))  +
@@ -169,6 +176,7 @@ relationship between pH and LCBD, and the contributions of each model
 component (directional and non-directional effects):
 
 ``` r
+
 newdata_mean = data.frame(pH = rep(mean(Xenv$pH), nrow(Xenv)))
 
 predict_tot <- data.frame(
@@ -191,10 +199,8 @@ predict_nondir <- data.frame(
 
 ## References
 
-Dray, Stéphane, Guillaume Blanchet, Daniel Borcard, Guillaume Guenard,
-Thibaut Jombart, Guillaume Larocque, Pierre Legendre, Naima Madi, Helene
-H Wagner, and Maintainer Stéphane Dray. 2018. “Package ‘Adespatial’.” *R
-Package* 2018: 3–8.
+Dray, Stéphane, Guillaume Blanchet, Daniel Borcard, et al. 2018.
+“Package ‘Adespatial’.” *R Package* 2018: 3–8.
 
 Hernández-Carrasco, Daniel, Anthony J Gillis, Hao Ran Lai, Tadeu
 Siqueira, and Jonathan D Tonkin. 2025. “Accounting for the Influence of

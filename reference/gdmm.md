@@ -129,8 +129,8 @@ gdmm(
 - method:
 
   Dissimilarity method applied to Y. See
-  [[`vegan::vegdist()`](https://vegandevs.github.io/vegan/reference/vegdist.html)](https://rdrr.io/cran/vegan/man/vegdist.html)
-  for a list of compatible methods. Default is `"bray"`.
+  [`vegan::vegdist()`](https://rdrr.io/cran/vegan/man/vegdist.html) for
+  a list of compatible methods. Default is `"bray"`.
 
 - control:
 

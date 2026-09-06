@@ -11,6 +11,7 @@ The package can be installed from GitHub using
 `devtools::install_github`:
 
 ``` r
+
 devtools::install_github('dhercar/gdmmTMB')
 ```
 
@@ -27,6 +28,7 @@ package. We start with two matrices:
 - `env`: A matrix of environmental covariates.
 
 ``` r
+
 library(tidyverse)
 library(gdmmTMB)
 
@@ -47,6 +49,7 @@ reflect the degree of directional community change along each
 environmental gradient.
 
 ``` r
+
 m <- gdmm(Y = sp[,-1],
           X = env,
           diss_formula = ~ isp(bio6) + isp(bio15) + isp(bio19),
@@ -63,15 +66,17 @@ m <- gdmm(Y = sp[,-1],
 
 We specify a `binomial` error family to model Jaccard dissimilarities,
 
-$$y_{ij} = \frac{b_{i} + b_{j}}{a_{ij} + b_{i} + b_{j}},$$
+``` math
+y_{ij} = \frac{b_i + b_j}{a_{ij} + b_i + b_j},
+```
 
-where the dissimilarity between observations $i$ and $j$ depends on the
-number of unshared ($b_{i},b_{j}$) and shared ($a_{ij}$) species.
+where the dissimilarity between observations $`i`$ and $`j`$ depends on
+the number of unshared ($`b_i, b_j`$) and shared ($`a_{ij}`$) species.
 
 By specifying a binomial distribution, the Jaccard dissimilarity index
-is modelled as the probability $\pi$ that a randomly chosen species from
-the combined species pool ($a_{ij} + b_{i} + b_{j}$) is not shared
-between observations $i$ and $j$.
+is modelled as the probability $`\pi`$ that a randomly chosen species
+from the combined species pool ($`a_{ij} + b_i + b_j`$) is not shared
+between observations $`i`$ and $`j`$.
 
 ### Model summary
 
@@ -81,6 +86,7 @@ intervals, and common metrics used for model selection such as AIC and
 BIC.
 
 ``` r
+
 summary(m)
 ```
 
@@ -148,6 +154,7 @@ and their confidence or credible intervals, which can be easily combined
 and plotted:
 
 ``` r
+
 f_x <- diss_gradient(m, CI_quant = c(0.5, 0.95))
 ```
 
@@ -157,6 +164,7 @@ confidence or credible interval, not the quantiles themselves (e.g.,
 50% and 95% credible credible intervals.
 
 ``` r
+
 library(ggplot2)
 
 do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
@@ -174,9 +182,9 @@ do.call(rbind, f_x) %>% ggplot(aes(fill = var)) +
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)
 
-The plot shows the relationship between each variable ($x$) and the same
-variable after applying the monotonic, non-linear transformation
-($f(x)$). Steeper increases in $f(x)$ correspond to fast community
+The plot shows the relationship between each variable ($`x`$) and the
+same variable after applying the monotonic, non-linear transformation
+($`f(x)`$). Steeper increases in $`f(x)`$ correspond to fast community
 change.
 
 # Package index
